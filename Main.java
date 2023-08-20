@@ -32,15 +32,16 @@ public class Main extends JPanel {
   // { 1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
   // { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
   // };
-  static int worldMap[][] = { { 1, 2, 1, 2, 1 },
+  static int worldMap[][] = {
+      { 1, 2, 4, 2, 7 },
       { 1, 0, 0, 0, 1 },
-      { 2, 0, 0, 0, 2 },
-      { 1, 0, 2, 0, 1 },
-      { 1, 2, 1, 2, 1 } };
+      { 3, 0, 0, 0, 5 },
+      { 1, 0, 6, 0, 1 },
+      { 8, 2, 1, 2, 12 } };
 
   public static void main(String[] args) {
-    double posX = 2, posY = 2; // x and y start position
-    double dirX = -1, dirY = 0; // initial direction vector
+    double posY = 2, posX = 2; // x and y start position
+    double dirX = -1, dirY = 1; // initial direction vector
     double planeX = 0, planeY = 0.66; // the 2d raycaster version of camera plane
     double time = 0; // time of current frame
     double oldTime = 0; // time of previous frame
@@ -54,10 +55,10 @@ public class Main extends JPanel {
     double hypX = 1000000000;
     double hypY = 1000000000;
     double hypMain = -1;
-    double xStep = 0;
     double yStep = 0;
-    double xn = 0;
+    double xStep = 0;
     double yn = 0;
+    double xn = 0;
     double xMain = 0;
     double yMain = 0;
     boolean noBoundary = true;
@@ -66,39 +67,80 @@ public class Main extends JPanel {
       // code for the ray to calculate the x boundaries
       if (dirY != 0) {
         if (count == 0) {
-          double posXfloor = Math.floor(posX);
-          // finding xStep
-          xStep = (1 - (posX - posXfloor)) * Integer.signum((int) Math.ceil(dirY)) * -1;
-        } else {
-          xStep++;
+          hypX = 0;
         }
-        yn = (Math.abs(dirX) / Math.abs(dirY)) * xStep * Integer.signum((int) Math.ceil(dirX)) * -1;
-        hypX = xStep * Math.sqrt(1 + Math.pow(dirX / dirY, 2));
+        if (hypX <= hypY) {
+          // if the position of the player is not on the edges
+          if (count == 0) {
+            // calculates the length of the step that is needed to reach the closest edge.
+            double posYfloor = Math.floor(posY);
+            if (dirY > 0) {
+              yStep = -(posY - posYfloor);
+            } else {
+              yStep = (1 - (posY - posYfloor));
+            }
+          } else {
+            // adds or subtracts one from yStep depending on the direction of dirY to reach
+            // the next edge
+            yStep += Integer.signum((int) Math.ceil(dirY)) * -1;
+          }
+          System.out.println("yStep: "+yStep);
+          // calculates the hypotinuse and the x factor that the line moves by.
+          if (dirX == 0) {
+            xn = 0;
+          } else {
+            xn = (Math.abs(yStep) / ((Math.abs(dirX) / Math.abs(dirY)))) * Integer.signum((int) Math.ceil(dirX));
+            System.out.println("xn: "+xn);
+          }
+          hypX = Math.abs(yStep) * Math.sqrt(1 + Math.pow(dirX / dirY, 2));
+          System.out.println("hypx: " +hypX);
+        }
       }
 
       if (dirX != 0) {
         if (count == 0) {
-          double postYfloor = Math.floor(posY);
-          yStep = (1 - (posY - postYfloor)) * Integer.signum((int) Math.ceil(dirX)) * -1;
-        } else {
-          yStep++;
+          hypY = 0;
         }
-        xn = (Math.abs(dirY) / Math.abs(dirX)) * yStep * Integer.signum((int) Math.ceil(dirY)) * -1;
-        hypY = yStep * Math.sqrt(1 + Math.pow(dirY / dirX, 2));
+        if (hypY <= hypX) {
+          if (count == 0) {
+            double posXfloor = Math.floor(posX);
+            // xStep = (1 - (posX - postYfloor)) * Integer.signum((int) Math.ceil(dirX)) *
+            // -1;
+            if (dirX > 0) {
+              xStep = 1 - (posX - posXfloor);
+            } else {
+              xStep = -(posX - posXfloor);
+            }
+          } else {
+            xStep += Integer.signum((int) Math.ceil(dirX));
+          }
+          System.out.println("xStep: "+xStep);
+          if (dirY == 0) {
+            yn = 0;
+          } else {
+            yn = (Math.abs(xStep) * (Math.abs(dirY) / Math.abs(dirX))) * Integer.signum((int) Math.ceil(dirY)) * -1;
+          }
+          System.out.println("yn: "+yn);
+          hypY = Math.abs(xStep) * Math.sqrt(1 + Math.pow(dirY / dirX, 2));
+          System.out.println("hypY: "+hypY);
+        }
       }
 
-      if(hypX < hypY){
-        xMain = xStep;
-        yMain = yn;
-      } else {
-        xMain = xn;
+      if (hypX < hypY) {
         yMain = yStep;
+        xMain = xn;
+        // System.out.println(xn);
+      } else {
+        yMain = yn;
+        xMain = xStep;
+        // System.out.println(xStep);
       }
 
-      System.out.println(xMain + posX);
-      System.out.println(yMain + posY);
-      System.out.println(worldMap[(int) (xMain + posX)][(int) (yMain + posY)]);
-      if(worldMap[(int) (xMain + posX)][(int) (yMain + posY)] != 0){
+      System.out.println(xMain + posX + " top");
+      System.out.println(yMain + posY + " bottom");
+      System.out.println(worldMap[(int) (yMain + posY)][(int) (xMain + posX)]);
+
+      if (worldMap[(int) (yMain + posY)][(int) (xMain + posX)] != 0) {
         noBoundary = false;
       }
       count++;
