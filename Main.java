@@ -36,12 +36,12 @@ public class Main extends JPanel {
       { 1, 2, 4, 2, 7 },
       { 1, 0, 0, 0, 1 },
       { 3, 0, 0, 0, 5 },
-      { 1, 0, 6, 0, 1 },
+      { 1, 0, 6, 0, 2 },
       { 8, 2, 1, 2, 12 } };
 
   public static void main(String[] args) {
     double posY = 2, posX = 2; // x and y start position
-    double dirX = -1, dirY = 1; // initial direction vector
+    double dirX = 1, dirY = -0.5; // initial direction vector
     double planeX = 0, planeY = 0.66; // the 2d raycaster version of camera plane
     double time = 0; // time of current frame
     double oldTime = 0; // time of previous frame
@@ -89,7 +89,7 @@ public class Main extends JPanel {
           if (dirX == 0) {
             xn = 0;
           } else {
-            xn = (Math.abs(yStep) / ((Math.abs(dirX) / Math.abs(dirY)))) * Integer.signum((int) Math.ceil(dirX));
+            xn = yStep / ((dirX / dirY));
             System.out.println("xn: "+xn);
           }
           hypX = Math.abs(yStep) * Math.sqrt(1 + Math.pow(dirX / dirY, 2));
@@ -118,7 +118,8 @@ public class Main extends JPanel {
           if (dirY == 0) {
             yn = 0;
           } else {
-            yn = (Math.abs(xStep) * (Math.abs(dirY) / Math.abs(dirX))) * Integer.signum((int) Math.ceil(dirY)) * -1;
+            yn = (xStep * (dirY / dirX)) * -1;
+            System.out.println("pp");
           }
           System.out.println("yn: "+yn);
           hypY = Math.abs(xStep) * Math.sqrt(1 + Math.pow(dirY / dirX, 2));
