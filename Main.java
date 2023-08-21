@@ -41,7 +41,7 @@ public class Main extends JPanel {
 
   public static void main(String[] args) {
     double posY = 2, posX = 2; // x and y start position
-    double dirX = 1, dirY = -0.5; // initial direction vector
+    double dirX = 1, dirY = 0.66; // initial direction vector
     double planeX = 0, planeY = 0.66; // the 2d raycaster version of camera plane
     double time = 0; // time of current frame
     double oldTime = 0; // time of previous frame
@@ -89,7 +89,7 @@ public class Main extends JPanel {
           if (dirX == 0) {
             xn = 0;
           } else {
-            xn = yStep / ((dirX / dirY));
+            xn = yStep / ((dirY / dirX)) * -1;
             System.out.println("xn: "+xn);
           }
           hypX = Math.abs(yStep) * Math.sqrt(1 + Math.pow(dirX / dirY, 2));
@@ -119,7 +119,6 @@ public class Main extends JPanel {
             yn = 0;
           } else {
             yn = (xStep * (dirY / dirX)) * -1;
-            System.out.println("pp");
           }
           System.out.println("yn: "+yn);
           hypY = Math.abs(xStep) * Math.sqrt(1 + Math.pow(dirY / dirX, 2));
@@ -139,9 +138,9 @@ public class Main extends JPanel {
 
       System.out.println(xMain + posX + " top");
       System.out.println(yMain + posY + " bottom");
-      System.out.println(worldMap[(int) (yMain + posY)][(int) (xMain + posX)]);
+      System.out.println(worldMap[(int) Math.round(yMain + posY)][(int) Math.round(xMain + posX)]);
 
-      if (worldMap[(int) (yMain + posY)][(int) (xMain + posX)] != 0) {
+      if (worldMap[(int) Math.round(yMain + posY)][(int) Math.round(xMain + posX)] != 0) {
         noBoundary = false;
       }
       count++;
