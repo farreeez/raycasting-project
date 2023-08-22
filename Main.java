@@ -34,14 +34,14 @@ public class Main extends JPanel {
   // };
   static int worldMap[][] = {
       { 1, 2, 4, 2, 7 },
-      { 1, 0, 0, 0, 1 },
+      { 9, 0, 0, 0, 18 },
       { 3, 0, 0, 0, 5 },
       { 1, 0, 6, 0, 2 },
       { 8, 2, 1, 2, 12 } };
 
   public static void main(String[] args) {
     double posY = 2, posX = 2; // x and y start position
-    double dirX = 1, dirY = -0.5; // initial direction vector
+    double dirX = -0.74, dirY = 1; // initial direction vector
     double planeX = 0, planeY = 0.66; // the 2d raycaster version of camera plane
     double time = 0; // time of current frame
     double oldTime = 0; // time of previous frame
@@ -82,14 +82,14 @@ public class Main extends JPanel {
           } else {
             // adds or subtracts one from yStep depending on the direction of dirY to reach
             // the next edge
-            yStep += Integer.signum((int) Math.ceil(dirY)) * -1;
+            yStep += getSign(dirY) * -1;
           }
           System.out.println("yStep: "+yStep);
           // calculates the hypotinuse and the x factor that the line moves by.
           if (dirX == 0) {
             xn = 0;
           } else {
-            xn = yStep / ((dirX / dirY));
+            xn = yStep / ((dirY / dirX)) * -1;
             System.out.println("xn: "+xn);
           }
           hypX = Math.abs(yStep) * Math.sqrt(1 + Math.pow(dirX / dirY, 2));
@@ -104,7 +104,7 @@ public class Main extends JPanel {
         if (hypY <= hypX) {
           if (count == 0) {
             double posXfloor = Math.floor(posX);
-            // xStep = (1 - (posX - postYfloor)) * Integer.signum((int) Math.ceil(dirX)) *
+            // xStep = (1 - (posX - postYfloor)) * getSign(dirX) *
             // -1;
             if (dirX > 0) {
               xStep = 1 - (posX - posXfloor);
@@ -112,14 +112,14 @@ public class Main extends JPanel {
               xStep = -(posX - posXfloor);
             }
           } else {
-            xStep += Integer.signum((int) Math.ceil(dirX));
+            xStep += getSign(dirX);
+            System.out.println("pp: "+getSign(dirX));
           }
           System.out.println("xStep: "+xStep);
           if (dirY == 0) {
             yn = 0;
           } else {
             yn = (xStep * (dirY / dirX)) * -1;
-            System.out.println("pp");
           }
           System.out.println("yn: "+yn);
           hypY = Math.abs(xStep) * Math.sqrt(1 + Math.pow(dirY / dirX, 2));
@@ -139,12 +139,20 @@ public class Main extends JPanel {
 
       System.out.println(xMain + posX + " top");
       System.out.println(yMain + posY + " bottom");
-      System.out.println(worldMap[(int) (yMain + posY)][(int) (xMain + posX)]);
+      System.out.println(worldMap[(int) Math.round(yMain + posY)][(int) Math.round(xMain + posX)]);
 
-      if (worldMap[(int) (yMain + posY)][(int) (xMain + posX)] != 0) {
+      if (worldMap[(int) Math.round(yMain + posY)][(int) Math.round(xMain + posX)] != 0) {
         noBoundary = false;
       }
       count++;
+    }
+  }
+
+  private static int getSign(double num){
+    if(num < 0){
+      return -1;
+    } else {
+      return 1;
     }
   }
 }
