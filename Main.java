@@ -41,7 +41,7 @@ public class Main extends JPanel {
 
   public static void main(String[] args) {
     double posY = 2, posX = 2; // x and y start position
-    double dirX = -0.74, dirY = 1; // initial direction vector
+    double dirX = -0.26, dirY = 1; // initial direction vector
     double planeX = 0, planeY = 0.66; // the 2d raycaster version of camera plane
     double time = 0; // time of current frame
     double oldTime = 0; // time of previous frame
