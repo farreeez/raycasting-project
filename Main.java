@@ -7,13 +7,10 @@ import java.awt.event.KeyListener;
 import javax.swing.*;
 
 public class Main extends JPanel implements KeyListener, ActionListener {
-  private static int mapWidth = 5;
-  private static int mapHeight = 5;
   private static int screenWidth = 640;
   private static int screenHeight = 480;
   private Player player = new Player();
   private Timer timer;
-  private double[] cast = player.ddaCaster();
   // static int worldMap[][] = {
   // { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
   // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
@@ -41,10 +38,11 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   // { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
   // };
 
-  public Main(){
+  public Main() {
     setFocusable(true);
     addKeyListener(this);
   }
+
   public static void main(String[] args) {
     JFrame frame = new JFrame("Raycaster");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -65,17 +63,19 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
-    cast = player.ddaCaster();
-    if (cast[1] == 1) {
-      g.setColor(Color.RED);
-    } else if (cast[1] == 2) {
-      g.setColor(Color.GREEN);
-    } else if (cast[1] == 3) {
-      g.setColor(Color.BLUE);
+    double[][] imageArray = player.ddaCaster();
+    for (int i = 0; i < imageArray.length; i++) {
+      if (imageArray[i][1] == 1) {
+        g.setColor(Color.RED);
+      } else if (imageArray[i][1] == 2) {
+        g.setColor(Color.GREEN);
+      } else if (imageArray[i][1] == 3) {
+        g.setColor(Color.BLUE);
+      }
+      int width = (int) Math.floor((double) screenWidth/(imageArray.length-17));
+      int height = 400;
+      g.fillRect(width*i, (screenHeight - height) / 4, width, height);
     }
-    int width = 100;
-    int height = 400;
-    g.fillRect(-99 , (screenHeight - height)/4 , width, height);
   }
 
   @Override
@@ -83,7 +83,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     int keyCode = move.getKeyCode();
     if (keyCode == KeyEvent.VK_RIGHT) {
       player.rotateRight();
-      System.out.println(cast[1]);
     } else if (keyCode == KeyEvent.VK_LEFT) {
       player.rotateLeft();
     }
@@ -92,7 +91,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   @Override
   public void keyTyped(KeyEvent e) {
     // TODO Auto-generated method stu
-    }
+  }
 
   @Override
   public void keyReleased(KeyEvent e) {
