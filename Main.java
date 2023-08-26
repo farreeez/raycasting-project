@@ -65,18 +65,38 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     super.paintComponent(g);
     double[][] imageArray = player.ddaCaster();
     for (int i = 0; i < imageArray.length; i++) {
-      if (imageArray[i][1] == 1) {
-        g.setColor(Color.RED);
-      } else if (imageArray[i][1] == 2) {
-        g.setColor(Color.GREEN);
-      } else if (imageArray[i][1] == 3) {
-        g.setColor(Color.BLUE);
+      double factor = 1/Math.pow(imageArray[i][1],1.5);
+      if(!(imageArray[i][1] > 0 && imageArray[i][1] < 7)){
+        factor = 0;
+        System.out.println(imageArray[i][1]);
       }
+      Color color = Color.GRAY;
+      if (imageArray[i][1] == 2) {
+        color = Color.GREEN;
+      } else if(imageArray[i][1] == 3){
+        color = Color.RED;
+      } else if(imageArray[i][1] == 1){
+        color = Color.BLUE;
+      }
+      g.setColor(adjustColorBrightness(color, factor));
       int width = (int) Math.floor((double) screenWidth/(imageArray.length-17));
       int height = 400;
       g.fillRect(width*i, (screenHeight - height) / 4, width, height);
     }
   }
+
+  private static Color adjustColorBrightness(Color color, double factor) {
+    int red = (int) (color.getRed() * factor);
+    int green = (int) (color.getGreen() * factor);
+    int blue = (int) (color.getBlue() * factor);
+    
+    // Ensure that the values are within the valid range (0-255)
+    red = Math.min(255, Math.max(0, red));
+    green = Math.min(255, Math.max(0, green));
+    blue = Math.min(255, Math.max(0, blue));
+    
+    return new Color(red, green, blue);
+}
 
   @Override
   public void keyPressed(KeyEvent move) {

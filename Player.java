@@ -1,18 +1,21 @@
 public class Player {
     private int worldMap[][] = {
-            { 1, 2, 3, 1, 2 },
-            { 2, 0, 0, 0, 3 },
-            { 3, 0, 0, 0, 1 },
-            { 2, 0, 0, 0, 2 },
-            { 1, 3, 2, 1, 3 } };
+            { 2, 2, 3, 2, 2 },
+            { 3, 0, 2, 0, 3 },
+            { 3, 0, 2, 0, 3 },
+            { 3, 0, 2, 0, 3 },
+            { 3, 0, 2, 0, 3 },
+            { 3, 0, 0, 0, 3 },
+            { 3, 0, 0, 0, 3 },
+            { 1, 1, 1, 1, 1 } };
 
-    private double posY = 2, posX = 2; // x and y start position
+    private double posY = 5, posX = 2; // x and y start position
     private double dirX = 0, dirY = 1; // initial direction vector
     private double angle = Math.atan(dirY / dirX);
     private double time = 0; // time of current frame
     private double oldTime = 0; // time of previous frame
     private int res = 201;
-    private double inc = Math.PI / 201;
+    private double inc = Math.PI / 402;
     private double[][] viewPlane = new double[res][3];
 
     // public double[] ddaCaster() {
@@ -45,7 +48,7 @@ public class Player {
             double yMain = 0;
             boolean noBoundary = true;
             int count = 0;
-            while (noBoundary && (Math.min(hypX, hypY) < 500 || count == 0)) {
+            while (noBoundary && (Math.min(hypX, hypY) < 100 || count == 0)) {
                 // code for the ray to calculate the x boundaries
                 if (viewPlane[i][1] != 0) {
                     if (count == 0) {
@@ -136,7 +139,7 @@ public class Player {
     // rotates the angle to the right
     public void rotateRight() {
         for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] -= 0.3926991;
+            viewPlane[i][0] += 0.3926991;
         }
         changeDirection();
     }
@@ -144,7 +147,7 @@ public class Player {
     // rotates the angle to the left
     public void rotateLeft() {
         for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] += 0.3926991;
+            viewPlane[i][0] -= 0.3926991;
         }
         changeDirection();
     }
