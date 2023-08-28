@@ -36,11 +36,11 @@ public class Player {
             { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
     };
 
-    private double posY = 1, posX = 2; // x and y start position
+    private double posY = 3, posX = 2; // x and y start position
     private double angle = Math.PI / 2;
     private double time = 0; // time of current frame
     private double oldTime = 0; // time of previous frame
-    private int res = 1001;
+    private int res = 1501;
     private double inc = Math.PI / (2 * res);
     private double[][] viewPlane = new double[res][3];
 
@@ -171,7 +171,7 @@ public class Player {
     // rotates the angle to the right
     public void rotateRight() {
         for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] -= 0.3926991;
+            viewPlane[i][0] -= 0.2;
         }
         changeDirection();
     }
@@ -179,7 +179,7 @@ public class Player {
     // rotates the angle to the left
     public void rotateLeft() {
         for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] += 0.3926991;
+            viewPlane[i][0] += 0.2;
         }
         changeDirection();
     }
@@ -219,8 +219,52 @@ public class Player {
         }
     }
 
-    public void moveForward(){
-        int posX = (int) Math.round(this.posX);
-        int posY = (int) Math.round(this.posY);
+    public void moveRight() {
+        double angle = viewPlane[(res - 1) / 2][0] - Math.PI / 2;
+        move(angle);
+    }
+
+    public void moveLeft() {
+        double angle = viewPlane[(res - 1) / 2][0] + Math.PI / 2;
+        move(angle);
+    }
+
+    public void moveForward() {
+        double angle = viewPlane[(res - 1) / 2][0];
+        move(angle);
+    }
+
+    public void moveBack() {
+        double angle = viewPlane[(res - 1) / 2][0] + Math.PI;
+        move(angle);
+    }
+
+    private void move(double angle) {
+        angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
+        double posX = this.posX;
+        double posY = this.posY;
+        if(angle >=0 && angle <= Math.PI/2){
+            posY -= Math.abs(Math.sin(angle));
+            posX += Math.abs(Math.cos(angle));
+        } else if (angle > Math.PI/2 && angle <= Math.PI){
+            posY -= Math.abs(Math.sin(Math.PI - angle));
+            posX -= Math.abs(Math.cos(Math.PI - angle));
+        } else if (angle > Math.PI && angle <= (3*Math.PI)/2){
+            posY += Math.abs(Math.sin(angle - Math.PI));
+            posX -= Math.abs(Math.cos(angle - Math.PI));
+        } else {
+            posY += Math.abs(Math.sin(2*Math.PI - angle));
+            posX += Math.abs(Math.cos(2*Math.PI - angle));
+        }
+
+        int y = (int) Math.round(posY);
+        int x = (int) Math.round(posX);
+        if(y >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0){
+            this.posY = posY;
+        }
+
+        if(x >= 0 && x < worldMap[y].length && worldMap[(int) Math.round(this.posY)][x] == 0){
+            this.posX = posX;
+        }
     }
 }

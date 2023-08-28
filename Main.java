@@ -7,36 +7,10 @@ import java.awt.event.KeyListener;
 import javax.swing.*;
 
 public class Main extends JPanel implements KeyListener, ActionListener {
-  private static int screenWidth = 640;
-  private static int screenHeight = 520;
+  private static int screenWidth = 1920;
+  private static int screenHeight = 1080;
   private Player player = new Player();
   private Timer timer;
-  // static int worldMap[][] = {
-  // { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 4, 0, 0, 0, 0, 5, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 4, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  // { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-  // };
 
   public Main() {
     setFocusable(true);
@@ -68,7 +42,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     // System.out.println("x: "+imageArray[100][3]);
     // System.out.println("angle: "+imageArray[100][1]);
     for (int i = 0; i < imageArray.length; i++) {
-      double factor = 1/Math.pow(imageArray[i][0],1);
+      double factor = 1/Math.pow(imageArray[i][0],0.5);
       // if(!(imageArray[i][0] > 0 && imageArray[i][0] < 7)){
       //   factor = 0;
       // }
@@ -84,8 +58,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         // System.out.println("blue: x: " + imageArray[i][2] + " y: " + imageArray[i][3]);
       }
       g.setColor(adjustColorBrightness(color, factor));
-      int width = (int) Math.ceil((double) ((double)screenWidth /(imageArray.length)));
-      int height = (int) Math.floor(((double) 480)/imageArray[i][0]);
+      int width = (int) Math.ceil((double) ((double) screenWidth /(imageArray.length)));
+      int height = (int) Math.floor(((double) screenHeight - 40)/imageArray[i][0]);
       g.fillRect(width*(i), (screenHeight - 40 - height)/2, width, height);
     }
   }
@@ -110,6 +84,14 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       player.rotateRight();
     } else if (keyCode == KeyEvent.VK_LEFT) {
       player.rotateLeft();
+    } else if (keyCode == KeyEvent.VK_W){
+      player.moveForward();
+    } else if (keyCode == KeyEvent.VK_S){
+      player.moveBack();
+    } else if (keyCode == KeyEvent.VK_D){
+      player.moveRight();
+    } else if (keyCode == KeyEvent.VK_A){
+      player.moveLeft();
     }
   }
 
