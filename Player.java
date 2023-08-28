@@ -14,11 +14,11 @@ public class Player {
             { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
             { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
             { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-            { 1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1 },
-            { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 1 },
             { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1 },
-            { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-            { 1, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 1 },
             { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
             { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
             { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
@@ -63,7 +63,7 @@ public class Player {
     }
 
     public double[][] ddaCaster() {
-        double[][] imageArray = new double[res][5];
+        double[][] imageArray = new double[res][3];
         for (int i = 0; i < viewPlane.length; i++) {
             double hypX = 1000000000;
             double hypY = 1000000000;
@@ -161,9 +161,12 @@ public class Player {
             // imageArray[i][1] is the integer denoting the colour/texture
             imageArray[i][0] = Math.sqrt(Math.pow(yMain, 2) + Math.pow(xMain, 2));
             imageArray[i][1] = colour;
-            imageArray[i][3] = viewPlane[i][2];
-            imageArray[i][2] = viewPlane[i][1];
-            imageArray[i][4] = viewPlane[i][0];
+            imageArray[i][2] = viewPlane[(res - 1) / 2][0] - viewPlane[i][0];
+            if (imageArray[i][2] < 0) {
+                imageArray[i][2] += 2 * Math.PI;
+            } else if (imageArray[i][2] > 2 * Math.PI) {
+                imageArray[i][2] -= 2 * Math.PI;
+            }
         }
         return imageArray;
     }
@@ -243,27 +246,27 @@ public class Player {
         angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
         double posX = this.posX;
         double posY = this.posY;
-        if(angle >=0 && angle <= Math.PI/2){
+        if (angle >= 0 && angle <= Math.PI / 2) {
             posY -= Math.abs(Math.sin(angle));
             posX += Math.abs(Math.cos(angle));
-        } else if (angle > Math.PI/2 && angle <= Math.PI){
+        } else if (angle > Math.PI / 2 && angle <= Math.PI) {
             posY -= Math.abs(Math.sin(Math.PI - angle));
             posX -= Math.abs(Math.cos(Math.PI - angle));
-        } else if (angle > Math.PI && angle <= (3*Math.PI)/2){
+        } else if (angle > Math.PI && angle <= (3 * Math.PI) / 2) {
             posY += Math.abs(Math.sin(angle - Math.PI));
             posX -= Math.abs(Math.cos(angle - Math.PI));
         } else {
-            posY += Math.abs(Math.sin(2*Math.PI - angle));
-            posX += Math.abs(Math.cos(2*Math.PI - angle));
+            posY += Math.abs(Math.sin(2 * Math.PI - angle));
+            posX += Math.abs(Math.cos(2 * Math.PI - angle));
         }
 
         int y = (int) Math.round(posY);
         int x = (int) Math.round(posX);
-        if(y >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0){
+        if (y >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
             this.posY = posY;
         }
 
-        if(x >= 0 && x < worldMap[y].length && worldMap[(int) Math.round(this.posY)][x] == 0){
+        if (x >= 0 && x < worldMap[y].length && worldMap[(int) Math.round(this.posY)][x] == 0) {
             this.posX = posX;
         }
     }

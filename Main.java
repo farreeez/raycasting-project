@@ -24,13 +24,13 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     frame.pack();
     frame.setVisible(true);
     Main main = new Main();
-    main.setBackground(Color.GRAY);
+    main.setBackground(Color.BLACK);
     frame.add(main);
     main.startGame();
   }
 
   private void startGame() {
-    timer = new Timer(100, this);
+    timer = new Timer(33, this);
     timer.start();
   }
 
@@ -42,25 +42,29 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     // System.out.println("x: "+imageArray[100][3]);
     // System.out.println("angle: "+imageArray[100][1]);
     for (int i = 0; i < imageArray.length; i++) {
-      double factor = 1/Math.pow(imageArray[i][0],0.5);
+      double factor = 1 / Math.pow(imageArray[i][0], 0.5);
       // if(!(imageArray[i][0] > 0 && imageArray[i][0] < 7)){
-      //   factor = 0;
+      // factor = 0;
       // }
       Color color = Color.GRAY;
       if (imageArray[i][1] == 2) {
         color = Color.GREEN;
-        // System.out.println("green: x: " + imageArray[i][2] + " y: " + imageArray[i][3]);
-      } else if(imageArray[i][1] == 3){
+        // System.out.println("green: x: " + imageArray[i][2] + " y: " +
+        // imageArray[i][3]);
+      } else if (imageArray[i][1] == 3) {
         color = Color.RED;
-        // System.out.println("red: x: " + imageArray[i][2] + " y: " + imageArray[i][3]);
-      } else if(imageArray[i][1] == 1){
+        // System.out.println("red: x: " + imageArray[i][2] + " y: " +
+        // imageArray[i][3]);
+      } else if (imageArray[i][1] == 1) {
         color = Color.BLUE;
-        // System.out.println("blue: x: " + imageArray[i][2] + " y: " + imageArray[i][3]);
+        // System.out.println("blue: x: " + imageArray[i][2] + " y: " +
+        // imageArray[i][3]);
       }
       g.setColor(adjustColorBrightness(color, factor));
-      int width = (int) Math.ceil((double) ((double) screenWidth /(imageArray.length)));
-      int height = (int) Math.floor(((double) screenHeight - 40)/imageArray[i][0]);
-      g.fillRect(width*(i), (screenHeight - 40 - height)/2, width, height);
+      double distance = Math.cos(imageArray[i][2]) * imageArray[i][0];
+      int width = (int) Math.ceil((double) ((double) screenWidth / (imageArray.length)));
+      int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance,1));
+      g.fillRect(width * (i), (screenHeight - 40 - height) / 2, width, height);
     }
   }
 
@@ -68,14 +72,14 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     int red = (int) (color.getRed() * factor);
     int green = (int) (color.getGreen() * factor);
     int blue = (int) (color.getBlue() * factor);
-    
+
     // Ensure that the values are within the valid range (0-255)
     red = Math.min(255, Math.max(0, red));
     green = Math.min(255, Math.max(0, green));
     blue = Math.min(255, Math.max(0, blue));
-    
+
     return new Color(red, green, blue);
-}
+  }
 
   @Override
   public void keyPressed(KeyEvent move) {
@@ -84,13 +88,13 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       player.rotateRight();
     } else if (keyCode == KeyEvent.VK_LEFT) {
       player.rotateLeft();
-    } else if (keyCode == KeyEvent.VK_W){
+    } else if (keyCode == KeyEvent.VK_W) {
       player.moveForward();
-    } else if (keyCode == KeyEvent.VK_S){
+    } else if (keyCode == KeyEvent.VK_S) {
       player.moveBack();
-    } else if (keyCode == KeyEvent.VK_D){
+    } else if (keyCode == KeyEvent.VK_D) {
       player.moveRight();
-    } else if (keyCode == KeyEvent.VK_A){
+    } else if (keyCode == KeyEvent.VK_A) {
       player.moveLeft();
     }
   }
