@@ -1,21 +1,47 @@
 public class Player {
-    private int worldMap[][] = {
-            { 2, 2, 3, 2, 2 },
-            { 3, 0, 2, 0, 3 },
-            { 3, 0, 2, 0, 3 },
-            { 3, 0, 2, 0, 3 },
-            { 3, 0, 2, 0, 3 },
-            { 3, 0, 0, 0, 3 },
-            { 3, 0, 0, 0, 3 },
-            { 1, 1, 1, 1, 1 } };
+    // private int worldMap[][] = {
+    // { 2, 2, 2, 2, 2 },
+    // { 3, 0, 0, 0, 3 },
+    // { 3, 0, 0, 0, 3 },
+    // { 3, 0, 0, 0, 3 },
+    // { 3, 0, 0, 0, 3 },
+    // { 3, 0, 0, 0, 3 },
+    // { 3, 0, 0, 0, 3 },
+    // { 1, 1, 1, 1, 1 } };
 
-    private double posY = 5, posX = 2; // x and y start position
-    private double dirX = 0, dirY = 1; // initial direction vector
-    private double angle = Math.atan(dirY / dirX);
+    private int worldMap[][] = {
+            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 4, 0, 0, 0, 0, 5, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 4, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+    };
+
+    private double posY = 1, posX = 2; // x and y start position
+    private double angle = Math.PI / 2;
     private double time = 0; // time of current frame
     private double oldTime = 0; // time of previous frame
-    private int res = 201;
-    private double inc = Math.PI / 402;
+    private int res = 1001;
+    private double inc = Math.PI / (2 * res);
     private double[][] viewPlane = new double[res][3];
 
     // public double[] ddaCaster() {
@@ -24,19 +50,20 @@ public class Player {
 
     public Player() {
         int pos = 0;
-        for (int i = 100; i >= 1; i--) {
-            viewPlane[pos][0] = angle - inc * i;
+        for (int i = (res - 1) / 2; i >= 1; i--) {
+            viewPlane[pos][0] = angle + inc * i;
             pos++;
         }
-        viewPlane[101][0] = angle;
-        for (int i = 0; i < 101; i++) {
-            viewPlane[i + 100][0] = angle + inc * i;
+        System.out.println(angle);
+        viewPlane[(res - 1) / 2 + 1][0] = angle;
+        for (int i = 0; i < (res - 1) / 2 + 1; i++) {
+            viewPlane[i + (res - 1) / 2][0] = angle - inc * (i + 1);
         }
         changeDirection();
     }
 
     public double[][] ddaCaster() {
-        double[][] imageArray = new double[201][2];
+        double[][] imageArray = new double[res][5];
         for (int i = 0; i < viewPlane.length; i++) {
             double hypX = 1000000000;
             double hypY = 1000000000;
@@ -48,7 +75,7 @@ public class Player {
             double yMain = 0;
             boolean noBoundary = true;
             int count = 0;
-            while (noBoundary && (Math.min(hypX, hypY) < 100 || count == 0)) {
+            while (noBoundary && (Math.min(hypX, hypY) < 1000 || count == 0)) {
                 // code for the ray to calculate the x boundaries
                 if (viewPlane[i][1] != 0) {
                     if (count == 0) {
@@ -65,7 +92,8 @@ public class Player {
                                 yStep = (1 - (posY - posYfloor));
                             }
                         } else {
-                            // adds or subtracts one from yStep depending on the direction of viewPlane[i][1] to reach
+                            // adds or subtracts one from yStep depending on the direction of
+                            // viewPlane[i][1] to reach
                             // the next edge
                             yStep += getSign(viewPlane[i][1]) * -1;
                         }
@@ -127,11 +155,15 @@ public class Player {
             int colour = 0;
             if (y >= 0 && x >= 0 && y < worldMap.length && x < worldMap[y].length) {
                 colour = worldMap[y][x];
+                imageArray[i][2] = (double) worldMap[y][x];
             }
             // imageArray[i][0] is the length of the hypMain
             // imageArray[i][1] is the integer denoting the colour/texture
             imageArray[i][0] = Math.sqrt(Math.pow(yMain, 2) + Math.pow(xMain, 2));
             imageArray[i][1] = colour;
+            imageArray[i][3] = viewPlane[i][2];
+            imageArray[i][2] = viewPlane[i][1];
+            imageArray[i][4] = viewPlane[i][0];
         }
         return imageArray;
     }
@@ -139,7 +171,7 @@ public class Player {
     // rotates the angle to the right
     public void rotateRight() {
         for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] += 0.3926991;
+            viewPlane[i][0] -= 0.3926991;
         }
         changeDirection();
     }
@@ -147,7 +179,7 @@ public class Player {
     // rotates the angle to the left
     public void rotateLeft() {
         for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] -= 0.3926991;
+            viewPlane[i][0] += 0.3926991;
         }
         changeDirection();
     }
@@ -157,16 +189,27 @@ public class Player {
     // viewPlane[i][1] is the dirY
     // viewPlane[i][2] is the dirX
     private void changeDirection() {
+        // changeDirection(Math.PI / 4 + Math.PI);
         for (int i = 0; i < viewPlane.length; i++) {
             viewPlane[i][0] = viewPlane[i][0] - Math.floor(viewPlane[i][0] / (2 * Math.PI)) * (2 * Math.PI);
             if (viewPlane[i][0] > Math.PI || viewPlane[i][0] < 0) {
                 viewPlane[i][1] = -1;
+                // System.out.println("down: " + (viewPlane[i][0]*180)/Math.PI);
             } else {
                 viewPlane[i][1] = 1;
+                // System.out.println("up: " + (viewPlane[i][0]*180)/Math.PI);
             }
-            viewPlane[i][2] = Math.tan(viewPlane[i][0]) * viewPlane[i][1];
+            viewPlane[i][2] = viewPlane[i][1] / Math.tan(viewPlane[i][0]);
         }
     }
+    // public void changeDirection(double angle) {
+    // angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
+    // if (angle > Math.PI || angle < 0) {
+    // System.out.println("down");
+    // } else {
+    // System.out.println("up");
+    // }
+    // }
 
     private int getSign(double num) {
         if (num < 0) {
@@ -174,5 +217,10 @@ public class Player {
         } else {
             return 1;
         }
+    }
+
+    public void moveForward(){
+        int posX = (int) Math.round(this.posX);
+        int posY = (int) Math.round(this.posY);
     }
 }
