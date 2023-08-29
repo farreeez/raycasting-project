@@ -68,6 +68,8 @@ public class Player {
             double yMain = 0;
             boolean noBoundary = true;
             int count = 0;
+            int y = 0;
+            int x = 0;
             // viewPlane[i][1] = dirY
             // viewPlane[i][2] = dirX
             while (noBoundary) {
@@ -138,15 +140,13 @@ public class Player {
                     xMain = xStep;
                 }
 
-                int y = (int) (yMain + posY);
-                int x = (int) (xMain + posX);
+                 y = (int) Math.round(yMain + posY);
+                 x = (int) Math.round(xMain + posX);
                 if (worldMap[y][x] != 0) {
                     noBoundary = false;
                 }
                 count++;
             }
-            int y = (int) (yMain + posY);
-            int x = (int) (xMain + posX);
             // System.out.println("----------------------------------------------");
             // System.out.println(viewPlane[i][1] + " " + viewPlane[i][2] + " " + posY + " "
             // + posX + " " + (yMain)
@@ -158,7 +158,8 @@ public class Player {
             // imageArray[i][1] is the integer denoting the colour/texture
             imageArray[i][0] = Math.sqrt(Math.pow(yMain, 2) + Math.pow(xMain, 2));
             if (imageArray[i][0] == 0) {
-                System.out.println("dirx: " );
+                System.out.println("diry: " + viewPlane[i][1]);
+                System.out.println("dirx: " + viewPlane[i][2]);
                 System.out.println("posy: " + (posY));
                 System.out.println("posx: " + (posX));
                 System.out.println("yMain: " + yMain);
@@ -267,25 +268,13 @@ public class Player {
 
         int y = (int) Math.round(posY);
         int x = (int) Math.round(posX);
-        if (posY >= 1 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
-            if (y < posY && worldMap[y + 1][(int) Math.round(this.posX)] == 0) {
-                this.posY = posY;
-            } else if (y > posY && worldMap[y - 1][(int) Math.round(this.posX)] == 0) {
-                this.posY = posY;
-            } else {
-                this.posY = posY;
-            }
+        if (posY >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
+            this.posY = posY;
         }
 
-        if (posX >= 1 && x < worldMap[(int) Math.round(this.posY)].length
+        if (posX >= 0 && x < worldMap[(int) Math.round(this.posY)].length
                 && worldMap[(int) Math.round(this.posY)][x] == 0) {
-            if (x < posX && worldMap[(int) Math.round(this.posY)][x + 1] == 0) {
-                this.posX = posX;
-            } else if (x > posX && worldMap[(int) Math.round(this.posY)][x - 1] == 0) {
-                this.posX = posX;
-            } else {
-                this.posX = posX;
-            }
+            this.posX = posX;
         }
 
     }
