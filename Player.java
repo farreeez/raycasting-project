@@ -4,9 +4,6 @@ public class Player {
     // { 3, 0, 0, 0, 3 },
     // { 3, 0, 0, 0, 3 },
     // { 3, 0, 0, 0, 3 },
-    // { 3, 0, 0, 0, 3 },
-    // { 3, 0, 0, 0, 3 },
-    // { 3, 0, 0, 0, 3 },
     // { 1, 1, 1, 1, 1 } };
 
     private int worldMap[][] = {
@@ -38,9 +35,7 @@ public class Player {
 
     private double posY = 3, posX = 2; // x and y start position
     private double angle = Math.PI / 2;
-    private double time = 0; // time of current frame
-    private double oldTime = 0; // time of previous frame
-    private int res = 1501;
+    private int res = 61;
     private double inc = Math.PI / (2 * res);
     private double[][] viewPlane = new double[res][3];
 
@@ -69,14 +64,15 @@ public class Player {
             double hypY = 1000000000;
             double yStep = 0;
             double xStep = 0;
-            double yn = 0;
-            double xn = 0;
             double xMain = 0;
             double yMain = 0;
             boolean noBoundary = true;
             int count = 0;
-            while (noBoundary && (Math.min(hypX, hypY) < 1000 || count == 0)) {
+            // viewPlane[i][1] = dirY
+            // viewPlane[i][2] = dirX
+            while (noBoundary) {
                 // code for the ray to calculate the x boundaries
+                boolean allowed = true;
                 if (viewPlane[i][1] != 0) {
                     if (count == 0) {
                         hypX = 0;
@@ -98,12 +94,13 @@ public class Player {
                             yStep += getSign(viewPlane[i][1]) * -1;
                         }
                         // calculates the hypotinuse and the x factor that the line moves by.
-                        if (viewPlane[i][2] == 0) {
-                            xn = 0;
-                        } else {
-                            xn = yStep / ((viewPlane[i][1] / viewPlane[i][2])) * -1;
-                        }
+                        // if (viewPlane[i][2] == 0) {
+                        // xn = 0;
+                        // } else {
+                        // xn = yStep / ((viewPlane[i][1] / viewPlane[i][2])) * -1;
+                        // }
                         hypX = Math.abs(yStep) * Math.sqrt(1 + Math.pow(viewPlane[i][2] / viewPlane[i][1], 2));
+                        allowed = false;
                     }
                 }
 
@@ -111,7 +108,7 @@ public class Player {
                     if (count == 0) {
                         hypY = 0;
                     }
-                    if (hypY <= hypX) {
+                    if (hypY <= hypX && allowed) {
                         if (count == 0) {
                             double posXfloor = Math.floor(posX);
                             // xStep = (1 - (posX - postYfloor)) * getSign(viewPlane[i][2]) *
@@ -124,42 +121,50 @@ public class Player {
                         } else {
                             xStep += getSign(viewPlane[i][2]);
                         }
-                        if (viewPlane[i][1] == 0) {
-                            yn = 0;
-                        } else {
-                            yn = (xStep * (viewPlane[i][1] / viewPlane[i][2])) * -1;
-                        }
+                        // if (viewPlane[i][1] == 0) {
+                        // yn = 0;
+                        // } else {
+                        // yn = (xStep * (viewPlane[i][1] / viewPlane[i][2])) * -1;
+                        // }
                         hypY = Math.abs(xStep) * Math.sqrt(1 + Math.pow(viewPlane[i][1] / viewPlane[i][2], 2));
                     }
                 }
 
                 if (hypX < hypY) {
                     yMain = yStep;
-                    xMain = xn;
+                    // xMain = xn;
                 } else {
-                    yMain = yn;
+                    // yMain = yn;
                     xMain = xStep;
                 }
 
-                int y = (int) (Math.floor(yMain) + posY);
-                int x = (int) (Math.floor(xMain) + posX);
-                if (y >= 0 && x >= 0 && y < worldMap.length && x < worldMap[y].length) {
-                    if (worldMap[y][x] != 0) {
-                        noBoundary = false;
-                    }
+                int y = (int) (yMain + posY);
+                int x = (int) (xMain + posX);
+                if (worldMap[y][x] != 0) {
+                    noBoundary = false;
                 }
                 count++;
             }
-            int y = (int) (Math.floor(yMain) + posY);
-            int x = (int) (Math.floor(xMain) + posX);
+            int y = (int) (yMain + posY);
+            int x = (int) (xMain + posX);
+            // System.out.println("----------------------------------------------");
+            // System.out.println(viewPlane[i][1] + " " + viewPlane[i][2] + " " + posY + " "
+            // + posX + " " + (yMain)
+            // + " " + (xMain));
             int colour = 0;
-            if (y >= 0 && x >= 0 && y < worldMap.length && x < worldMap[y].length) {
-                colour = worldMap[y][x];
-                imageArray[i][2] = (double) worldMap[y][x];
-            }
+            colour = worldMap[y][x];
+            imageArray[i][2] = (double) worldMap[y][x];
             // imageArray[i][0] is the length of the hypMain
             // imageArray[i][1] is the integer denoting the colour/texture
             imageArray[i][0] = Math.sqrt(Math.pow(yMain, 2) + Math.pow(xMain, 2));
+            if (imageArray[i][0] == 0) {
+                System.out.println("dirx: " );
+                System.out.println("posy: " + (posY));
+                System.out.println("posx: " + (posX));
+                System.out.println("yMain: " + yMain);
+                System.out.println("xMain: " + xMain);
+                System.out.println("-------------------------------------------------------------------");
+            }
             imageArray[i][1] = colour;
             imageArray[i][2] = viewPlane[(res - 1) / 2][0] - viewPlane[i][0];
             if (imageArray[i][2] < 0) {
@@ -262,12 +267,26 @@ public class Player {
 
         int y = (int) Math.round(posY);
         int x = (int) Math.round(posX);
-        if (y >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
-            this.posY = posY;
+        if (posY >= 1 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
+            if (y < posY && worldMap[y + 1][(int) Math.round(this.posX)] == 0) {
+                this.posY = posY;
+            } else if (y > posY && worldMap[y - 1][(int) Math.round(this.posX)] == 0) {
+                this.posY = posY;
+            } else {
+                this.posY = posY;
+            }
         }
 
-        if (x >= 0 && x < worldMap[y].length && worldMap[(int) Math.round(this.posY)][x] == 0) {
-            this.posX = posX;
+        if (posX >= 1 && x < worldMap[(int) Math.round(this.posY)].length
+                && worldMap[(int) Math.round(this.posY)][x] == 0) {
+            if (x < posX && worldMap[(int) Math.round(this.posY)][x + 1] == 0) {
+                this.posX = posX;
+            } else if (x > posX && worldMap[(int) Math.round(this.posY)][x - 1] == 0) {
+                this.posX = posX;
+            } else {
+                this.posX = posX;
+            }
         }
+
     }
 }
