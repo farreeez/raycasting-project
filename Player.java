@@ -236,11 +236,9 @@ public class Player {
                 && worldMap[(int) Math.round(this.posY)][x] == 0) {
             this.posX = posX;
             if(viewPlane[1500/2][0] == hypY){
-                System.out.println("pp");
             }
 
             if(viewPlane[1500/2][0] == hypX){
-                System.out.println("xpp");
             }
         }
 
