@@ -30,7 +30,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   }
 
   private void startGame() {
-    timer = new Timer(33, this);
+    timer = new Timer(15, this);
     timer.start();
   }
 
@@ -42,7 +42,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     // System.out.println("x: "+imageArray[100][3]);
     // System.out.println("angle: "+imageArray[100][1]);
     for (int i = 0; i < imageArray.length; i++) {
-      double factor = 1 / Math.pow(imageArray[i][0], 0.5);
+      double factor = imageArray[i][3] / Math.pow(imageArray[i][0], 0.2);
       // if(!(imageArray[i][0] > 0 && imageArray[i][0] < 7)){
       // factor = 0;
       // }

@@ -1,7 +1,7 @@
 public class Player {
     // private int worldMap[][] = {
     // { 2, 2, 2, 2, 2 },
-    // { 3, 0, 0, 0, 3 },
+    // { 3, 0, 2, 0, 3 },
     // { 3, 0, 0, 0, 3 },
     // { 3, 0, 0, 0, 3 },
     // { 1, 1, 1, 1, 1 } };
@@ -38,18 +38,14 @@ public class Player {
     private int res = 1501;
     private double inc = Math.PI / (2 * res);
     private double[][] viewPlane = new double[res][3];
-
-    // public double[] ddaCaster() {
-    // return ddaCaster(dirX, dirY);
-    // }
-
+    double hypX = 0;
+    double hypY = 0;
     public Player() {
         int pos = 0;
         for (int i = (res - 1) / 2; i >= 1; i--) {
             viewPlane[pos][0] = angle + inc * i;
             pos++;
         }
-        System.out.println(angle);
         viewPlane[(res - 1) / 2 + 1][0] = angle;
         for (int i = 0; i < (res - 1) / 2 + 1; i++) {
             viewPlane[i + (res - 1) / 2][0] = angle - inc * (i + 1);
@@ -58,10 +54,10 @@ public class Player {
     }
 
     public double[][] ddaCaster() {
-        double[][] imageArray = new double[res][3];
+        double[][] imageArray = new double[res][4];
         for (int i = 0; i < viewPlane.length; i++) {
-            double hypX = 1000000000;
-            double hypY = 1000000000;
+             hypX = 1000000000;
+             hypY = 1000000000;
             double yStep = 0;
             double xStep = 0;
             double xMain = 0;
@@ -70,8 +66,8 @@ public class Player {
             int count = 0;
             int y = 0;
             int x = 0;
-            // viewPlane[i][1] = dirY
-            // viewPlane[i][2] = dirX
+            // viewPlane[i][1] is dirY
+            // viewPlane[i][2] is dirX
             while (noBoundary) {
                 // code for the ray to calculate the x boundaries
                 boolean allowed = true;
@@ -96,11 +92,6 @@ public class Player {
                             yStep += getSign(viewPlane[i][1]) * -1;
                         }
                         // calculates the hypotinuse and the x factor that the line moves by.
-                        // if (viewPlane[i][2] == 0) {
-                        // xn = 0;
-                        // } else {
-                        // xn = yStep / ((viewPlane[i][1] / viewPlane[i][2])) * -1;
-                        // }
                         hypX = Math.abs(yStep) * Math.sqrt(1 + Math.pow(viewPlane[i][2] / viewPlane[i][1], 2));
                         allowed = false;
                     }
@@ -113,8 +104,6 @@ public class Player {
                     if (hypY <= hypX && allowed) {
                         if (count == 0) {
                             double posXfloor = Math.floor(posX);
-                            // xStep = (1 - (posX - postYfloor)) * getSign(viewPlane[i][2]) *
-                            // -1;
                             if (viewPlane[i][2] > 0) {
                                 xStep = 1 - (posX - posXfloor);
                             } else {
@@ -123,23 +112,16 @@ public class Player {
                         } else {
                             xStep += getSign(viewPlane[i][2]);
                         }
-                        // if (viewPlane[i][1] == 0) {
-                        // yn = 0;
-                        // } else {
-                        // yn = (xStep * (viewPlane[i][1] / viewPlane[i][2])) * -1;
-                        // }
                         hypY = Math.abs(xStep) * Math.sqrt(1 + Math.pow(viewPlane[i][1] / viewPlane[i][2], 2));
                     }
                 }
 
                 if (hypX < hypY) {
                     yMain = yStep;
-                    imageArray[i][0] = hypX;
-                    // xMain = xn;
-                } else {
-                    // yMain = yn;
-                    imageArray[i][0] = hypY;
+                    imageArray[i][3] = 1;
+                } else if (hypY < hypX){
                     xMain = xStep;
+                    imageArray[i][3] = 0.5;
                 }
 
                  y = (int) Math.round(yMain + posY);
@@ -149,25 +131,10 @@ public class Player {
                 }
                 count++;
             }
-            // System.out.println("----------------------------------------------");
-            // System.out.println(viewPlane[i][1] + " " + viewPlane[i][2] + " " + posY + " "
-            // + posX + " " + (yMain)
-            // + " " + (xMain));
-            int colour = 0;
-            colour = worldMap[y][x];
-            imageArray[i][2] = (double) worldMap[y][x];
-            // imageArray[i][0] is the length of the hypMain
-            // imageArray[i][1] is the integer denoting the colour/texture
-            if (imageArray[i][0] == 0) {
-                System.out.println("diry: " + viewPlane[i][1]);
-                System.out.println("dirx: " + viewPlane[i][2]);
-                System.out.println("posy: " + (posY));
-                System.out.println("posx: " + (posX));
-                System.out.println("yMain: " + yMain);
-                System.out.println("xMain: " + xMain);
-                System.out.println("-------------------------------------------------------------------");
-            }
-            imageArray[i][1] = colour;
+            // imageArray[i][1] is for colour.
+            // imageArray[i][2] is for the angle between the ray and the player direction this is used for fisheye correction.
+            imageArray[i][0] = Math.min(hypX,hypY);
+            imageArray[i][1] = worldMap[y][x];
             imageArray[i][2] = viewPlane[(res - 1) / 2][0] - viewPlane[i][0];
             if (imageArray[i][2] < 0) {
                 imageArray[i][2] += 2 * Math.PI;
@@ -204,22 +171,12 @@ public class Player {
             viewPlane[i][0] = viewPlane[i][0] - Math.floor(viewPlane[i][0] / (2 * Math.PI)) * (2 * Math.PI);
             if (viewPlane[i][0] > Math.PI || viewPlane[i][0] < 0) {
                 viewPlane[i][1] = -1;
-                // System.out.println("down: " + (viewPlane[i][0]*180)/Math.PI);
             } else {
                 viewPlane[i][1] = 1;
-                // System.out.println("up: " + (viewPlane[i][0]*180)/Math.PI);
             }
             viewPlane[i][2] = viewPlane[i][1] / Math.tan(viewPlane[i][0]);
         }
     }
-    // public void changeDirection(double angle) {
-    // angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
-    // if (angle > Math.PI || angle < 0) {
-    // System.out.println("down");
-    // } else {
-    // System.out.println("up");
-    // }
-    // }
 
     private int getSign(double num) {
         if (num < 0) {
@@ -250,32 +207,41 @@ public class Player {
     }
 
     private void move(double angle) {
+        double speed = 0.1;
         angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
         double posX = this.posX;
         double posY = this.posY;
         if (angle >= 0 && angle <= Math.PI / 2) {
-            posY -= Math.abs(Math.sin(angle));
-            posX += Math.abs(Math.cos(angle));
+            posY -= Math.abs(Math.sin(angle) * speed);
+            posX += Math.abs(Math.cos(angle) * speed);
         } else if (angle > Math.PI / 2 && angle <= Math.PI) {
-            posY -= Math.abs(Math.sin(Math.PI - angle));
-            posX -= Math.abs(Math.cos(Math.PI - angle));
+            posY -= Math.abs(Math.sin(Math.PI - angle) * speed);
+            posX -= Math.abs(Math.cos(Math.PI - angle) * speed);
         } else if (angle > Math.PI && angle <= (3 * Math.PI) / 2) {
-            posY += Math.abs(Math.sin(angle - Math.PI));
-            posX -= Math.abs(Math.cos(angle - Math.PI));
+            posY += Math.abs(Math.sin(angle - Math.PI) * speed);
+            posX -= Math.abs(Math.cos(angle - Math.PI) * speed);
         } else {
-            posY += Math.abs(Math.sin(2 * Math.PI - angle));
-            posX += Math.abs(Math.cos(2 * Math.PI - angle));
+            posY += Math.abs(Math.sin(2 * Math.PI - angle) * speed);
+            posX += Math.abs(Math.cos(2 * Math.PI - angle) * speed);
         }
 
         int y = (int) Math.round(posY);
         int x = (int) Math.round(posX);
         if (posY >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
             this.posY = posY;
+            
         }
 
         if (posX >= 0 && x < worldMap[(int) Math.round(this.posY)].length
                 && worldMap[(int) Math.round(this.posY)][x] == 0) {
             this.posX = posX;
+            if(viewPlane[1500/2][0] == hypY){
+                System.out.println("pp");
+            }
+
+            if(viewPlane[1500/2][0] == hypX){
+                System.out.println("xpp");
+            }
         }
 
     }
