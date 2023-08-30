@@ -35,7 +35,7 @@ public class Player {
 
     private double posY = 3, posX = 2; // x and y start position
     private double angle = Math.PI / 2;
-    private int res = 61;
+    private int res = 1501;
     private double inc = Math.PI / (2 * res);
     private double[][] viewPlane = new double[res][3];
 
@@ -134,9 +134,11 @@ public class Player {
 
                 if (hypX < hypY) {
                     yMain = yStep;
+                    imageArray[i][0] = hypX;
                     // xMain = xn;
                 } else {
                     // yMain = yn;
+                    imageArray[i][0] = hypY;
                     xMain = xStep;
                 }
 
@@ -156,7 +158,6 @@ public class Player {
             imageArray[i][2] = (double) worldMap[y][x];
             // imageArray[i][0] is the length of the hypMain
             // imageArray[i][1] is the integer denoting the colour/texture
-            imageArray[i][0] = Math.sqrt(Math.pow(yMain, 2) + Math.pow(xMain, 2));
             if (imageArray[i][0] == 0) {
                 System.out.println("diry: " + viewPlane[i][1]);
                 System.out.println("dirx: " + viewPlane[i][2]);
