@@ -207,7 +207,7 @@ public class Player {
     }
 
     private void move(double angle) {
-        double speed = 0.1;
+        double speed = 1;
         angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
         double posX = this.posX;
         double posY = this.posY;
@@ -236,11 +236,9 @@ public class Player {
                 && worldMap[(int) Math.round(this.posY)][x] == 0) {
             this.posX = posX;
             if(viewPlane[1500/2][0] == hypY){
-                System.out.println("pp");
             }
 
             if(viewPlane[1500/2][0] == hypX){
-                System.out.println("xpp");
             }
         }
 

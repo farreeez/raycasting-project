@@ -21,11 +21,11 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     JFrame frame = new JFrame("Raycaster");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setPreferredSize(new Dimension(screenWidth, screenHeight));
-    frame.pack();
-    frame.setVisible(true);
     Main main = new Main();
     main.setBackground(Color.BLACK);
     frame.add(main);
+    frame.pack();
+    frame.setVisible(true);
     main.startGame();
   }
 
