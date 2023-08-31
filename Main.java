@@ -22,7 +22,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setPreferredSize(new Dimension(screenWidth, screenHeight));
     Main main = new Main();
-    main.setBackground(Color.BLACK);
+    main.setBackground(Color.gray);
     frame.add(main);
     frame.pack();
     frame.setVisible(true);
@@ -63,7 +63,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       g.setColor(adjustColorBrightness(color, factor));
       double distance = Math.cos(imageArray[i][2]) * imageArray[i][0];
       int width = (int) Math.ceil((double) ((double) screenWidth / (imageArray.length)));
-      int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance,1));
+      int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance,0.8));
       g.fillRect(width * (i), (screenHeight - 40 - height) / 2, width, height);
     }
   }

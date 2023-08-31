@@ -36,10 +36,12 @@ public class Player {
     private double posY = 3, posX = 2; // x and y start position
     private double angle = Math.PI / 2;
     private int res = 1501;
-    private double inc = Math.PI / (2 * res);
+    private double fov = 90;
+    private double inc = Math.toRadians(fov/(res));
     private double[][] viewPlane = new double[res][3];
     double hypX = 0;
     double hypY = 0;
+
     public Player() {
         int pos = 0;
         for (int i = (res - 1) / 2; i >= 1; i--) {
@@ -56,19 +58,20 @@ public class Player {
     public double[][] ddaCaster() {
         double[][] imageArray = new double[res][4];
         for (int i = 0; i < viewPlane.length; i++) {
-             hypX = 1000000000;
-             hypY = 1000000000;
+            hypX = 1000000000;
+            hypY = 1000000000;
             double yStep = 0;
             double xStep = 0;
             double xMain = 0;
             double yMain = 0;
             boolean noBoundary = true;
             int count = 0;
+            int xCount = 0;
             int y = 0;
             int x = 0;
             // viewPlane[i][1] is dirY
             // viewPlane[i][2] is dirX
-            while (noBoundary) {
+            while (noBoundary && count < 100) {
                 // code for the ray to calculate the x boundaries
                 boolean allowed = true;
                 if (viewPlane[i][1] != 0) {
@@ -102,9 +105,9 @@ public class Player {
                         hypY = 0;
                     }
                     if (hypY <= hypX && allowed) {
-                        if (count == 0) {
+                        if (xCount == 0) {
                             double posXfloor = Math.floor(posX);
-                            if (viewPlane[i][2] > 0) {
+                            if (viewPlane[i][2] < 0) {
                                 xStep = 1 - (posX - posXfloor);
                             } else {
                                 xStep = -(posX - posXfloor);
@@ -113,28 +116,34 @@ public class Player {
                             xStep += getSign(viewPlane[i][2]);
                         }
                         hypY = Math.abs(xStep) * Math.sqrt(1 + Math.pow(viewPlane[i][1] / viewPlane[i][2], 2));
+                        xCount++;
                     }
                 }
 
                 if (hypX < hypY) {
                     yMain = yStep;
                     imageArray[i][3] = 1;
-                } else if (hypY < hypX){
+                } else if (hypY < hypX) {
                     xMain = xStep;
                     imageArray[i][3] = 0.5;
                 }
 
-                 y = (int) Math.round(yMain + posY);
-                 x = (int) Math.round(xMain + posX);
-                if (worldMap[y][x] != 0) {
-                    noBoundary = false;
+                y = (int) Math.round(yMain + posY);
+                x = (int) Math.round(xMain + posX);
+                if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
+                    if (worldMap[y][x] != 0) {
+                        noBoundary = false;
+                    }
                 }
                 count++;
             }
             // imageArray[i][1] is for colour.
-            // imageArray[i][2] is for the angle between the ray and the player direction this is used for fisheye correction.
-            imageArray[i][0] = Math.min(hypX,hypY);
-            imageArray[i][1] = worldMap[y][x];
+            // imageArray[i][2] is for the angle between the ray and the player direction
+            // this is used for fisheye correction.
+            imageArray[i][0] = Math.min(hypX, hypY);
+            if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
+                imageArray[i][1] = worldMap[y][x];
+            }
             imageArray[i][2] = viewPlane[(res - 1) / 2][0] - viewPlane[i][0];
             if (imageArray[i][2] < 0) {
                 imageArray[i][2] += 2 * Math.PI;
@@ -207,7 +216,7 @@ public class Player {
     }
 
     private void move(double angle) {
-        double speed = 1;
+        double speed = 0.1;
         angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
         double posX = this.posX;
         double posY = this.posY;
@@ -229,17 +238,11 @@ public class Player {
         int x = (int) Math.round(posX);
         if (posY >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
             this.posY = posY;
-            
         }
 
         if (posX >= 0 && x < worldMap[(int) Math.round(this.posY)].length
                 && worldMap[(int) Math.round(this.posY)][x] == 0) {
             this.posX = posX;
-            if(viewPlane[1500/2][0] == hypY){
-            }
-
-            if(viewPlane[1500/2][0] == hypX){
-            }
         }
 
     }
