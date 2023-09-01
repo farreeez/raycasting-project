@@ -35,22 +35,25 @@ public class Player {
 
     private double posY = 3, posX = 2; // x and y start position
     private double angle = Math.PI / 2;
-    private int res = 1501;
+    private int res;
     private double fov = 90;
-    private double inc = Math.toRadians(fov/(res));
-    private double[][] viewPlane = new double[res][3];
-    double hypX = 0;
-    double hypY = 0;
+    private double inc;
+    private double[][] viewPlane;
+    private double hypX = 0;
+    private double hypY = 0;
 
-    public Player() {
+    public Player(int res) {
         int pos = 0;
-        for (int i = (res - 1) / 2; i >= 1; i--) {
+        this.res = res - 17;
+        inc = Math.toRadians(fov / (this.res));
+        viewPlane = new double[this.res][3];
+        for (int i = (this.res - 1) / 2; i >= 1; i--) {
             viewPlane[pos][0] = angle + inc * i;
             pos++;
         }
-        viewPlane[(res - 1) / 2 + 1][0] = angle;
-        for (int i = 0; i < (res - 1) / 2 + 1; i++) {
-            viewPlane[i + (res - 1) / 2][0] = angle - inc * (i + 1);
+        viewPlane[(this.res - 1) / 2 + 1][0] = angle;
+        for (int i = 0; i < (this.res - 1) / 2 + 1; i++) {
+            viewPlane[i + (this.res - 1) / 2][0] = angle - inc * (i + 1);
         }
         changeDirection();
     }
@@ -127,7 +130,7 @@ public class Player {
                     xMain = xStep;
                     imageArray[i][3] = 0.5;
                 }
-
+                
                 y = (int) Math.round(yMain + posY);
                 x = (int) Math.round(xMain + posX);
                 if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
@@ -137,6 +140,17 @@ public class Player {
                 }
                 count++;
             }
+
+            // if (Math.floor(yMain + posY) != (yMain + posY) || Math.floor(xMain + posX) != (xMain + posX)) {
+            //     System.out.println("y: " + (yMain + posY));
+            //     System.out.println("x: " + (xMain + posX));
+            //     System.out.println("diry: " + viewPlane[i][1]);
+            //     System.out.println("dirx: " + viewPlane[i][2]);
+            //     System.out.println("posx: " + posX);
+            //     System.out.println("posy: " + posY);
+            //     System.out.println("-------------------------------------------------------------------");
+            // }
+            
             // imageArray[i][1] is for colour.
             // imageArray[i][2] is for the angle between the ray and the player direction
             // this is used for fisheye correction.
@@ -216,7 +230,7 @@ public class Player {
     }
 
     private void move(double angle) {
-        double speed = 0.1;
+        double speed = 0.25;
         angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
         double posX = this.posX;
         double posY = this.posY;

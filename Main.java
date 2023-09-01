@@ -9,7 +9,7 @@ import javax.swing.*;
 public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenWidth = 1920;
   private static int screenHeight = 1080;
-  private Player player = new Player();
+  private Player player = new Player(screenWidth);
   private Timer timer;
 
   public Main() {
@@ -62,7 +62,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
       g.setColor(adjustColorBrightness(color, factor));
       double distance = Math.cos(imageArray[i][2]) * imageArray[i][0];
-      int width = (int) Math.ceil((double) ((double) screenWidth / (imageArray.length)));
+      double screenWidth = Main.screenWidth - 17;
+      int width = (int) Math.floor((double) screenWidth / (imageArray.length));
       int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance,0.8));
       g.fillRect(width * (i), (screenHeight - 40 - height) / 2, width, height);
     }
