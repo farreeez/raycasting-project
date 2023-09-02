@@ -33,8 +33,8 @@ public class Player {
             { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
     };
 
-    private double posY = 3, posX = 2; // x and y start position
-    private double angle = Math.PI / 2;
+    private double posY = 2.4, posX = 3.2; // x and y start position
+    private double angle = 2.49;
     private int res;
     private double fov = 90;
     private double inc;
@@ -44,7 +44,7 @@ public class Player {
 
     public Player(int res) {
         int pos = 0;
-        this.res = res - 17;
+        this.res = res;
         inc = Math.toRadians(fov / (this.res));
         viewPlane = new double[this.res][3];
         for (int i = (this.res - 1) / 2; i >= 1; i--) {
@@ -67,6 +67,8 @@ public class Player {
             double xStep = 0;
             double xMain = 0;
             double yMain = 0;
+            double firstY = 0;
+            double firstX = 0;
             boolean noBoundary = true;
             int count = 0;
             int xCount = 0;
@@ -107,13 +109,13 @@ public class Player {
                     if (count == 0) {
                         hypY = 0;
                     }
-                    if (hypY <= hypX && allowed) {
+                    if ((hypY <= hypX && allowed) || xCount == 0) {
                         if (xCount == 0) {
                             double posXfloor = Math.floor(posX);
                             if (viewPlane[i][2] < 0) {
-                                xStep = 1 - (posX - posXfloor);
-                            } else {
                                 xStep = -(posX - posXfloor);
+                            } else {
+                                xStep = 1 - (posX - posXfloor);
                             }
                         } else {
                             xStep += getSign(viewPlane[i][2]);
@@ -130,9 +132,9 @@ public class Player {
                     xMain = xStep;
                     imageArray[i][3] = 0.5;
                 }
-                
-                y = (int) Math.round(yMain + posY);
-                x = (int) Math.round(xMain + posX);
+
+                y = (int) Math.floor(yMain + (posY));
+                x = (int) Math.floor(xMain + (posX));
                 if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
                     if (worldMap[y][x] != 0) {
                         noBoundary = false;
@@ -141,16 +143,19 @@ public class Player {
                 count++;
             }
 
-            // if (Math.floor(yMain + posY) != (yMain + posY) || Math.floor(xMain + posX) != (xMain + posX)) {
-            //     System.out.println("y: " + (yMain + posY));
-            //     System.out.println("x: " + (xMain + posX));
-            //     System.out.println("diry: " + viewPlane[i][1]);
-            //     System.out.println("dirx: " + viewPlane[i][2]);
-            //     System.out.println("posx: " + posX);
-            //     System.out.println("posy: " + posY);
-            //     System.out.println("-------------------------------------------------------------------");
+            // if (i == 10) {
+            // System.out.println("y: " + (yMain + posY));
+            // System.out.println("x: " + (xMain + posX));
+            // System.out.println("diry: " + viewPlane[i][1]);
+            // System.out.println("dirx: " + viewPlane[i][2]);
+            // System.out.println("posx: " + posX);
+            // System.out.println("posy: " + posY);
+            // System.out.println("colour: " + worldMap[y][x]);
+            // System.out.println("xMain: " + xMain);
+            // System.out.println("yMain: " + yMain);
+            // System.out.println("-------------------------------------------------------------------");
             // }
-            
+
             // imageArray[i][1] is for colour.
             // imageArray[i][2] is for the angle between the ray and the player direction
             // this is used for fisheye correction.
@@ -248,14 +253,14 @@ public class Player {
             posX += Math.abs(Math.cos(2 * Math.PI - angle) * speed);
         }
 
-        int y = (int) Math.round(posY);
-        int x = (int) Math.round(posX);
-        if (posY >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
+        int y = (int) Math.floor(posY);
+        int x = (int) Math.floor(posX);
+        if (posY >= 0 && y < worldMap.length && worldMap[y][(int) Math.floor(this.posX)] == 0) {
             this.posY = posY;
         }
 
-        if (posX >= 0 && x < worldMap[(int) Math.round(this.posY)].length
-                && worldMap[(int) Math.round(this.posY)][x] == 0) {
+        if (posX >= 0 && x < worldMap[(int) Math.floor(this.posY)].length
+                && worldMap[(int) Math.floor(this.posY)][x] == 0) {
             this.posX = posX;
         }
 

@@ -9,7 +9,7 @@ import javax.swing.*;
 public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenWidth = 1920;
   private static int screenHeight = 1080;
-  private Player player = new Player(screenWidth);
+  private Player player = new Player(21);
   private Timer timer;
 
   public Main() {
