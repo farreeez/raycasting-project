@@ -11,6 +11,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenHeight = 1080;
   private Player player = new Player(21);
   private Timer timer;
+  public static boolean forward = false;
+  public static boolean backward = false;
+  public static boolean right = false;
+  public static boolean left = false;
 
   public Main() {
     setFocusable(true);
@@ -37,6 +41,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
+    int screenWidth = Main.screenWidth - 17;
     double[][] imageArray = player.ddaCaster();
     // System.out.println("y: "+imageArray[100][2]);
     // System.out.println("x: "+imageArray[100][3]);
@@ -62,10 +67,32 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
       g.setColor(adjustColorBrightness(color, factor));
       double distance = Math.cos(imageArray[i][2]) * imageArray[i][0];
-      double screenWidth = Main.screenWidth - 17;
-      int width = (int) Math.floor((double) screenWidth / (imageArray.length));
-      int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance,0.8));
+      int width = (int) Math.round((double) screenWidth / (imageArray.length));
+      int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance, 0.8));
       g.fillRect(width * (i), (screenHeight - 40 - height) / 2, width, height);
+    }
+
+    int[][] worldMap = player.getMap();
+    int width = (int) Math.floor((double) screenWidth / 6);
+    int height = (worldMap.length / worldMap[0].length) * width;
+
+    g.setColor(Color.BLACK);
+    g.fillRect(screenWidth - width + 1, 0, width, height);
+    for (int i = 0; i < worldMap.length; i++) {
+      for (int j = 0; j < worldMap[i].length; j++) {
+        Color color = Color.BLACK;
+        if (worldMap[i][j] == 2) {
+          color = Color.GREEN;
+        } else if (worldMap[i][j] == 3) {
+          color = Color.RED;
+        } else if (worldMap[i][j] == 1) {
+          color = Color.BLUE;
+        }
+        int smallWidth = (int) Math.round((double) width/worldMap[i].length);
+        int smallHeight = (int) Math.round((double) height/worldMap.length);        
+        g.setColor(color);
+        g.fillRect(screenWidth - width + 1 + smallWidth * j , smallHeight * i, smallWidth, smallHeight);
+      }
     }
   }
 
@@ -90,12 +117,16 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     } else if (keyCode == KeyEvent.VK_LEFT) {
       player.rotateLeft();
     } else if (keyCode == KeyEvent.VK_W) {
+      forward = true;
       player.moveForward();
     } else if (keyCode == KeyEvent.VK_S) {
+      backward = true;
       player.moveBack();
     } else if (keyCode == KeyEvent.VK_D) {
+      right = true;
       player.moveRight();
     } else if (keyCode == KeyEvent.VK_A) {
+      left = true;
       player.moveLeft();
     }
   }
@@ -107,7 +138,18 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
   @Override
   public void keyReleased(KeyEvent e) {
-    // TODO Auto-generated method stub
+    int keyCode = e.getKeyCode();
+    if (keyCode == KeyEvent.VK_RIGHT) {
+    } else if (keyCode == KeyEvent.VK_LEFT) {
+    } else if (keyCode == KeyEvent.VK_W) {
+      forward = false;
+    } else if (keyCode == KeyEvent.VK_S) {
+      backward = false;
+    } else if (keyCode == KeyEvent.VK_D) {
+      right = false;
+    } else if (keyCode == KeyEvent.VK_A) {
+      left = false;
+    }
   }
 
   @Override
