@@ -1,4 +1,5 @@
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class Player {
     // private int worldMap[][] = {
@@ -36,7 +37,7 @@ public class Player {
     };
 
     private double posY = 2.4, posX = 3.2; // x and y start position
-    private double angle = Math.PI/2;
+    private double angle = Math.PI / 2;
     private int res;
     private double fov = 90;
     private double inc;
@@ -49,7 +50,7 @@ public class Player {
         this.res = res;
         inc = Math.toRadians(fov / (this.res));
         viewPlane = new double[this.res][3];
-        for (int i = (this.res - 1) / 2 ; i >= 1; i--) {
+        for (int i = (this.res - 1) / 2; i >= 1; i--) {
             viewPlane[pos][0] = angle + inc * i;
             pos++;
         }
@@ -60,12 +61,13 @@ public class Player {
         }
 
         // for (int i = 0; i < viewPlane.length; i++) {
-        //     System.out.println("angle " + (i + 1) + ": " + (viewPlane[i][0] * 180) / Math.PI);
+        // System.out.println("angle " + (i + 1) + ": " + (viewPlane[i][0] * 180) /
+        // Math.PI);
         // }
         changeDirection();
     }
 
-    public int[][] getMap(){
+    public int[][] getMap() {
         return worldMap;
     }
 
@@ -152,19 +154,19 @@ public class Player {
                 count++;
             }
 
-            if (i == 0) {
-            System.out.println("y: " + (yMain + posY));
-            System.out.println("x: " + (xMain + posX));
-            System.out.println("diry: " + viewPlane[i][1]);
-            System.out.println("dirx: " + viewPlane[i][2]);
-            System.out.println("angle: " + (viewPlane[i][0] * 180) / Math.PI);
-            System.out.println("posx: " + posX);
-            System.out.println("posy: " + posY);
-            System.out.println("colour: " + worldMap[y][x]);
-            System.out.println("xMain: " + xMain);
-            System.out.println("yMain: " + yMain);
-            System.out.println("-------------------------------------------------------------------");
-            }
+            // if (i == 0) {
+            // System.out.println("y: " + (yMain + posY));
+            // System.out.println("x: " + (xMain + posX));
+            // System.out.println("diry: " + viewPlane[i][1]);
+            // System.out.println("dirx: " + viewPlane[i][2]);
+            // System.out.println("angle: " + (viewPlane[i][0] * 180) / Math.PI);
+            // System.out.println("posx: " + posX);
+            // System.out.println("posy: " + posY);
+            // System.out.println("colour: " + worldMap[y][x]);
+            // System.out.println("xMain: " + xMain);
+            // System.out.println("yMain: " + yMain);
+            // System.out.println("-------------------------------------------------------------------");
+            // }
 
             // imageArray[i][1] is for colour.
             // imageArray[i][2] is for the angle between the ray and the player direction
@@ -185,18 +187,40 @@ public class Player {
 
     // rotates the angle to the right
     public void rotateRight() {
-        for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] -= 0.2;
-        }
-        changeDirection();
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                if (Main.right) {
+                    for (int i = 0; i < viewPlane.length; i++) {
+                        viewPlane[i][0] -= 0.01;
+                    }
+                    changeDirection();
+                } else {
+                    timer.cancel();
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(task, 0, 5);
     }
 
     // rotates the angle to the left
     public void rotateLeft() {
-        for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] += 0.2;
-        }
-        changeDirection();
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                if (Main.left) {
+                    for (int i = 0; i < viewPlane.length; i++) {
+                        viewPlane[i][0] += 0.01;
+                    }
+                    changeDirection();
+                } else {
+                    timer.cancel();
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(task, 0, 5);
     }
 
     // changes the direction vector according to the angle
@@ -216,7 +240,8 @@ public class Player {
         }
 
         // for (int i = 0; i < viewPlane.length; i++) {
-        //     System.out.println("original angle "+(i + 1)+": " + viewPlane[i][0] + "   new angle: " + Math.atan(viewPlane[i][1]/viewPlane[i][2]));
+        // System.out.println("original angle "+(i + 1)+": " + viewPlane[i][0] + " new
+        // angle: " + Math.atan(viewPlane[i][1]/viewPlane[i][2]));
         // }
     }
 
@@ -228,29 +253,41 @@ public class Player {
         }
     }
 
-    public void moveRight() {
-        double angle = viewPlane[(res - 1) / 2][0] - Math.PI / 2;
-        move(angle);
-    }
-
-    public void moveLeft() {
-        double angle = viewPlane[(res - 1) / 2][0] + Math.PI / 2;
-        move(angle);
-    }
-
     public void moveForward() {
-        double angle = viewPlane[(res - 1) / 2][0];
-        move(angle);
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                if (Main.forward) {
+                    double angle = viewPlane[(res - 1) / 2][0];
+                    move(angle);
+                } else {
+                    timer.cancel();
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(task, 0, 5);
     }
 
     public void moveBack() {
-        double angle = viewPlane[(res - 1) / 2][0] + Math.PI;
-        move(angle);
-        // Timer timer = new Timer(1,task);
+
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                if (Main.backward) {
+                    double angle = viewPlane[(res - 1) / 2][0] + Math.PI;
+                    move(angle);
+                } else {
+                    timer.cancel();
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(task, 0, 5);
     }
 
     private void move(double angle) {
-        double speed = 0.25;
+        double speed = 0.025;
         angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
         double posX = this.posX;
         double posY = this.posY;

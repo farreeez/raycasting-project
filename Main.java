@@ -9,12 +9,16 @@ import javax.swing.*;
 public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenWidth = 1920;
   private static int screenHeight = 1080;
-  private Player player = new Player(21);
+  private Player player = new Player(screenWidth - 17);
   private Timer timer;
   public static boolean forward = false;
   public static boolean backward = false;
   public static boolean right = false;
   public static boolean left = false;
+  private boolean mvfor = true;
+  private boolean mvback = true;
+  private boolean rtRight = true;
+  private boolean rtLeft = true;
 
   public Main() {
     setFocusable(true);
@@ -88,10 +92,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         } else if (worldMap[i][j] == 1) {
           color = Color.BLUE;
         }
-        int smallWidth = (int) Math.round((double) width/worldMap[i].length);
-        int smallHeight = (int) Math.round((double) height/worldMap.length);        
+        int smallWidth = (int) Math.round((double) width / worldMap[i].length);
+        int smallHeight = (int) Math.round((double) height / worldMap.length);
         g.setColor(color);
-        g.fillRect(screenWidth - width + 1 + smallWidth * j , smallHeight * i, smallWidth, smallHeight);
+        g.fillRect(screenWidth - width + 1 + smallWidth * j, smallHeight * i, smallWidth, smallHeight);
       }
     }
   }
@@ -112,22 +116,30 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   @Override
   public void keyPressed(KeyEvent move) {
     int keyCode = move.getKeyCode();
-    if (keyCode == KeyEvent.VK_RIGHT) {
-      player.rotateRight();
-    } else if (keyCode == KeyEvent.VK_LEFT) {
-      player.rotateLeft();
-    } else if (keyCode == KeyEvent.VK_W) {
-      forward = true;
-      player.moveForward();
-    } else if (keyCode == KeyEvent.VK_S) {
-      backward = true;
-      player.moveBack();
-    } else if (keyCode == KeyEvent.VK_D) {
+    if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_D) {
       right = true;
-      player.moveRight();
-    } else if (keyCode == KeyEvent.VK_A) {
+      if (rtRight) {
+        player.rotateRight();
+        rtRight = false;
+      }
+    } else if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_A) {
       left = true;
-      player.moveLeft();
+      if (rtLeft) {
+        player.rotateLeft();
+        rtLeft = false;
+      }
+    } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
+      forward = true;
+      if (mvfor) {
+        player.moveForward();
+        mvfor = false;
+      }
+    } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
+      backward = true;
+      if (mvback) {
+        player.moveBack();
+        mvback = false;
+      }
     }
   }
 
@@ -139,16 +151,18 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   @Override
   public void keyReleased(KeyEvent e) {
     int keyCode = e.getKeyCode();
-    if (keyCode == KeyEvent.VK_RIGHT) {
-    } else if (keyCode == KeyEvent.VK_LEFT) {
-    } else if (keyCode == KeyEvent.VK_W) {
-      forward = false;
-    } else if (keyCode == KeyEvent.VK_S) {
-      backward = false;
-    } else if (keyCode == KeyEvent.VK_D) {
+    if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_D) {
       right = false;
-    } else if (keyCode == KeyEvent.VK_A) {
+      rtRight = true;
+    } else if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_A) {
       left = false;
+      rtLeft = true;
+    } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
+      forward = false;
+      mvfor = true;
+    } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
+      backward = false;
+      mvback = true;
     }
   }
 
