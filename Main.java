@@ -9,7 +9,9 @@ import javax.swing.*;
 public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenWidth = 1920;
   private static int screenHeight = 1080;
-  private Player player = new Player(21);
+  public static boolean debug = false;
+  private int res = screenWidth - 17;
+  private Player player;
   private Timer timer;
   public static boolean forward = false;
   public static boolean backward = false;
@@ -23,9 +25,12 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private boolean mvLeft = true;
   private boolean rtRight = true;
   private boolean rtLeft = true;
-  private double[][] imageArray = player.ddaCaster();
 
   public Main() {
+    if (debug) {
+      res = 21;
+    }
+    player = new Player(res);
     setFocusable(true);
     addKeyListener(this);
   }
@@ -55,15 +60,16 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     int screenWidth = Main.screenWidth - 17;
-    double[][] temp = player.ddaCaster();
-    if (temp != null) {
-      imageArray = player.ddaCaster();
-    }
+    double[][] imageArray = player.ddaCaster();
     // System.out.println("y: "+imageArray[100][2]);
     // System.out.println("x: "+imageArray[100][3]);
     // System.out.println("angle: "+imageArray[100][1]);
     for (int i = 0; i < imageArray.length; i++) {
-      double factor = imageArray[i][3] / Math.pow(imageArray[i][0], 0.2);
+      double originalDistance = imageArray[i][0];
+      if (originalDistance < 1) {
+        originalDistance = 1;
+      }
+      double factor = imageArray[i][3] / Math.pow(originalDistance, 0.2);
       // if(!(imageArray[i][0] > 0 && imageArray[i][0] < 7)){
       // factor = 0;
       // }
@@ -82,22 +88,21 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         // imageArray[i][3]);
       }
       g.setColor(adjustColorBrightness(color, factor));
-      double distance = Math.cos(imageArray[i][2]) * imageArray[i][0];
-      if (distance < 1) {
-        distance = 1;
-      }
+      double distance = Math.cos(imageArray[i][2]) * originalDistance;
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
       int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance, 0.8));
       g.fillRect(width * (i), (screenHeight - 40 - height) / 2, width, height);
-      g.setColor(Color.WHITE);
-      g.setFont(g.getFont().deriveFont(24, 17.0f));
-      g.drawString("y: " + rounder(imageArray[i][4]), width * (i), 100);
-      g.drawString("x: " + rounder(imageArray[i][5]), width * (i), 200);
-      g.drawString("ang: " + rounder(imageArray[i][6]), width * (i), 300);
-      g.drawString("x: " + rounder(imageArray[i][7]), width * (i), 400);
-      g.drawString("y: " + rounder(imageArray[i][8]), width * (i), 500);
-      g.drawString("colour: " + rounder(imageArray[i][9]), width * (i), 600);
-      g.drawString("distance: " + rounder(imageArray[i][0]), width * i, 700);
+      if (debug) {
+        g.setColor(Color.WHITE);
+        g.setFont(g.getFont().deriveFont(24, 17.0f));
+        g.drawString("y: " + rounder(imageArray[i][4]), width * (i), 100);
+        g.drawString("x: " + rounder(imageArray[i][5]), width * (i), 200);
+        g.drawString("ang: " + rounder(imageArray[i][6]), width * (i), 300);
+        g.drawString("x: " + rounder(imageArray[i][7]), width * (i), 400);
+        g.drawString("y: " + rounder(imageArray[i][8]), width * (i), 500);
+        g.drawString("colour: " + rounder(imageArray[i][9]), width * (i), 600);
+        g.drawString("distance: " + rounder(imageArray[i][0]), width * i, 700);
+      }
     }
 
     int[][] worldMap = player.getMap();
