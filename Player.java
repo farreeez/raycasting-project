@@ -92,7 +92,7 @@ public class Player {
       double xStep = 0;
       double xMain = 0;
       double yMain = 0;
-      int roundingValue = 32;
+      int roundingValue = 16;
       double posX = this.posX * roundingValue;
       double posY = this.posY * roundingValue;
       boolean noBoundary = true;
@@ -250,6 +250,13 @@ public class Player {
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
+  public void mouseAim(double movement) {
+    for (int i = 0; i < viewPlane.length; i++) {
+      viewPlane[i][0] += (Math.PI / 100) * movement * 0.8;
+    }
+    changeDirection();
+  }
+
   // changes the direction vector according to the angle
   // viewPlane[i][0] is the angle
   // viewPlane[i][1] is the dirY
@@ -345,7 +352,7 @@ public class Player {
   }
 
   private void move(double angle) {
-    double speed = 0.025;
+    double speed = 0.02;
     angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
     double posX = this.posX;
     double posY = this.posY;

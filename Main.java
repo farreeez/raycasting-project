@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 
@@ -35,6 +36,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private int centreY;
   private Robot robot;
   private static boolean mouseLock = false;
+  private static Cursor originalCursor;
+  private static Cursor blankCursor;
 
   public Main() {
     if (debug) {
@@ -51,13 +54,23 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       e.printStackTrace();
     }
 
+    // Transparent 16 x 16 pixel cursor image.
+    BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+
+    // Create a new blank cursor.
+    blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+        cursorImg, new Point(0, 0), "blank cursor");
+
+    originalCursor = getCursor();
+
     centreX = screenWidth / 2;
     centreY = screenHeight / 2;
     this.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
         if (mouseLock) {
-          int changeX = e.getXOnScreen() - centreX;
+          double factor = 50 / (double) centreX;
+          player.mouseAim(factor * (centreX - e.getXOnScreen()));
           robot.mouseMove(centreX, centreY);
         }
       }
@@ -170,7 +183,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     int playerPosX = screenWidth - width + 1 + (int) Math.round(smallWidth * position[1]);
     int playerPosY = (int) Math.round(smallHeight * position[0]);
     g.fillOval(playerPosX, playerPosY, radius, radius);
-    double angle = player.getAngle() + Math.PI/2;
+    double angle = player.getAngle() + Math.PI / 2;
     // angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
     int playerPeekX = playerPosX + (int) (radius / 2 * Math.sin(angle)) + radius / 4;
     int playerPeekY = playerPosY + (int) (radius / 2 * Math.cos(angle)) + radius / 4;
@@ -237,9 +250,14 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       } else {
         device.setFullScreenWindow(frame);
       }
-      
+
       fullscreen = !fullscreen;
-    } else if (keyCode == KeyEvent.VK_F2){
+    } else if (keyCode == KeyEvent.VK_F2) {
+      if (mouseLock) {
+        setCursor(originalCursor);
+      } else {
+        setCursor(blankCursor);
+      }
       mouseLock = !mouseLock;
     }
   }
