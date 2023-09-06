@@ -3,6 +3,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.*;
 
@@ -25,18 +27,45 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private boolean mvLeft = true;
   private boolean rtRight = true;
   private boolean rtLeft = true;
+  private static GraphicsDevice device = GraphicsEnvironment
+      .getLocalGraphicsEnvironment().getScreenDevices()[1];
+  private boolean fullscreen = false;
+  private static JFrame frame;
+  private int centreX;
+  private int centreY;
+  private Robot robot;
+  private static boolean mouseLock = false;
 
   public Main() {
     if (debug) {
       res = 21;
     }
+
     player = new Player(res);
     setFocusable(true);
     addKeyListener(this);
+
+    try {
+      this.robot = new Robot();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    centreX = screenWidth / 2;
+    centreY = screenHeight / 2;
+    this.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        if (mouseLock) {
+          int changeX = e.getXOnScreen() - centreX;
+          robot.mouseMove(centreX, centreY);
+        }
+      }
+    });
   }
 
   public static void main(String[] args) {
-    JFrame frame = new JFrame("Raycaster");
+    frame = new JFrame("Raycaster");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setPreferredSize(new Dimension(screenWidth, screenHeight));
     Main main = new Main();
@@ -69,7 +98,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       if (originalDistance < 1) {
         originalDistance = 1;
       }
-      double factor = imageArray[i][3] / Math.pow(originalDistance, 0.2);
+      double factor = 0;
+      if (imageArray[i][1] != 0) {
+        factor = imageArray[i][3] / Math.pow(originalDistance, 0.2);
+      }
       // if(!(imageArray[i][0] > 0 && imageArray[i][0] < 7)){
       // factor = 0;
       // }
@@ -87,7 +119,11 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         // System.out.println("blue: x: " + imageArray[i][2] + " y: " +
         // imageArray[i][3]);
       }
-      g.setColor(adjustColorBrightness(color, factor));
+      if (imageArray[i][1] != 0) {
+        g.setColor(adjustColorBrightness(color, factor));
+      } else {
+        g.setColor(color);
+      }
       double distance = Math.cos(imageArray[i][2]) * originalDistance;
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
       int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance, 0.8));
@@ -111,8 +147,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     int smallWidth = (int) Math.round((double) width / worldMap[0].length);
     int smallHeight = (int) Math.round((double) height / worldMap.length);
 
-    g.setColor(Color.WHITE);
-    g.fillRect(screenWidth - width + 1, 0, width, height);
     for (int i = 0; i < worldMap.length; i++) {
       for (int j = 0; j < worldMap[i].length; j++) {
         Color color = Color.BLACK;
@@ -132,14 +166,15 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
     double[] position = player.getPosition();
     g.setColor(Color.WHITE);
-    int radius = 10;
+    int radius = 16;
     int playerPosX = screenWidth - width + 1 + (int) Math.round(smallWidth * position[1]);
     int playerPosY = (int) Math.round(smallHeight * position[0]);
     g.fillOval(playerPosX, playerPosY, radius, radius);
-    double angle = player.getAngle();
-    angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
+    double angle = player.getAngle() + Math.PI/2;
+    // angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
     int playerPeekX = playerPosX + (int) (radius / 2 * Math.sin(angle)) + radius / 4;
     int playerPeekY = playerPosY + (int) (radius / 2 * Math.cos(angle)) + radius / 4;
+    g.setColor(Color.BLUE);
     g.fillOval(playerPeekX, playerPeekY, radius / 2, radius / 2);
   }
 
@@ -195,6 +230,17 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         player.moveRight();
         mvRight = false;
       }
+      // currently not working correctly
+    } else if (keyCode == KeyEvent.VK_F1) {
+      if (fullscreen) {
+        device.setFullScreenWindow(null);
+      } else {
+        device.setFullScreenWindow(frame);
+      }
+      
+      fullscreen = !fullscreen;
+    } else if (keyCode == KeyEvent.VK_F2){
+      mouseLock = !mouseLock;
     }
   }
 

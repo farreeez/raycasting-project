@@ -82,7 +82,7 @@ public class Player {
 
   public double[][] ddaCaster() {
     double[][] imageArray = new double[res][4];
-    if(Main.debug){
+    if (Main.debug) {
       imageArray = new double[res][10];
     }
     for (int i = 0; i < viewPlane.length; i++) {
@@ -102,7 +102,7 @@ public class Player {
       int x = 0;
       // viewPlane[i][1] is dirY
       // viewPlane[i][2] is dirX
-      while (noBoundary) {
+      while (noBoundary && count < 2000) {
         // code for the ray to calculate the x boundaries
         boolean allowed = true;
         if (viewPlane[i][1] != 0) {
@@ -220,7 +220,7 @@ public class Player {
       public void run() {
         if (Main.rotateRight) {
           for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] -= 0.01;
+            viewPlane[i][0] -= 0.017;
           }
           changeDirection();
         } else {
@@ -239,7 +239,7 @@ public class Player {
       public void run() {
         if (Main.rotateLeft) {
           for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] += 0.01;
+            viewPlane[i][0] += 0.017;
           }
           changeDirection();
         } else {
@@ -366,18 +366,10 @@ public class Player {
     int y = (int) Math.round(posY);
     int x = (int) Math.round(posX);
 
-    // if (worldMap[y + 1][(int) Math.round(this.posX)] != 0 && y + 1 - posY < 1) {
-    // } else if (worldMap[y - 1][(int) Math.round(this.posX)] != 0 && posY - (y -
-    // 1) < 1) {
-    // } else
     if (posY >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
       this.posY = posY;
     }
 
-    // if (worldMap[(int) Math.round(this.posY)][x + 1] != 0 && x + 1 - posX < 1){
-    // } else if (worldMap[(int) Math.round(this.posY)][x - 1] != 0 && posX - (x-1)
-    // < 1){
-    // } else
     if (posX >= 0 && x < worldMap[(int) Math.round(this.posY)].length
         && worldMap[(int) Math.round(this.posY)][x] == 0) {
       this.posX = posX;
