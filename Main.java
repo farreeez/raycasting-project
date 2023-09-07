@@ -10,10 +10,11 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 public class Main extends JPanel implements KeyListener, ActionListener {
-  private static int screenWidth = 1920;
-  private static int screenHeight = 1080;
-  public static boolean debug = false;
+  private static int screenWidth = 1280;
+  private static int screenHeight = 720;
   private int res = screenWidth - 17;
+  public static boolean debug = false;
+  // private int res = screenWidth - 17;
   private Player player;
   private Timer timer;
   public static boolean forward = false;
@@ -42,6 +43,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   public Main() {
     if (debug) {
       res = 21;
+    } else if (res % 2 == 0) {
+      res += 1;
     }
 
     player = new Player(res);
@@ -138,9 +141,14 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         g.setColor(color);
       }
       double distance = Math.cos(imageArray[i][2]) * originalDistance;
-      int width = (int) Math.round((double) screenWidth / (imageArray.length));
       int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance, 0.8));
-      g.fillRect(width * (i), (screenHeight - 40 - height) / 2, width, height);
+      int startingHeight = (screenHeight - 40 - height) / 2;
+      int width = (int) Math.round((double) screenWidth / (imageArray.length));
+      int heightFactor = height / screenHeight;
+      // g.drawRect(width * i, startingHeight, width, height);
+      for (int j = 0; j < height; j++) {
+        g.drawLine(width * i, startingHeight + j, width * (i + 1), startingHeight + j);
+      }
       if (debug) {
         g.setColor(Color.WHITE);
         g.setFont(g.getFont().deriveFont(24, 17.0f));
@@ -150,7 +158,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         g.drawString("x: " + rounder(imageArray[i][7]), width * (i), 400);
         g.drawString("y: " + rounder(imageArray[i][8]), width * (i), 500);
         g.drawString("colour: " + rounder(imageArray[i][9]), width * (i), 600);
-        g.drawString("distance: " + rounder(imageArray[i][0]), width * i, 700);
+        g.drawString("dist: " + rounder(imageArray[i][0]), width * i, 700);
       }
     }
 
