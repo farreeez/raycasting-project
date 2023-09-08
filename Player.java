@@ -9,7 +9,7 @@ public class Player {
   // { 3, 0, 0, 0, 3 },
   // { 1, 1, 1, 1, 1 } };
 
-  private double posY = 3, posX = 1.45; // x and y start position
+  private double posY = 1, posX = 1; // x and y start position
   private double angle = Math.toRadians(90);
   private int res;
   private double fov = 90;
@@ -55,9 +55,9 @@ public class Player {
   }
 
   public double[][] ddaCaster() {
-    double[][] imageArray = new double[res][4];
+    double[][] imageArray = new double[res][5];
     if (Main.debug) {
-      imageArray = new double[res][10];
+      imageArray = new double[res][11];
     }
     for (int i = 0; i < viewPlane.length; i++) {
       hypX = 1000000000;
@@ -143,24 +143,41 @@ public class Player {
         count++;
       }
 
+      if ((viewPlane[i][0] <= (3 / 4) * Math.PI && viewPlane[i][0] >= (1 / 4) * Math.PI)
+          || (viewPlane[i][0] >= -(3 / 4) * Math.PI && viewPlane[i][0] <= -(1 / 4) * Math.PI) ||
+          (viewPlane[i][0] >= -(7 / 4) * Math.PI && viewPlane[i][0] <= -(5 / 4) * Math.PI) ||
+          (viewPlane[i][0] <= (7 / 4) * Math.PI && viewPlane[i][0] >= (5 / 4) * Math.PI)) {
+      }
+
+      imageArray[i][0] = Math.min(hypX, hypY);
+      if (imageArray[i][3] == 1) {
+        // y
+        double opposite = Math.tan(viewPlane[i][0]) * imageArray[i][0];
+        imageArray[i][4] = (opposite + posX) - Math.floor(opposite + posX);
+      } else {
+        // x
+        double adjacent = Math.cos(viewPlane[i][0]) * imageArray[i][0];
+        imageArray[i][4] = (adjacent + posX) - Math.floor(adjacent + posX);
+      }
+
       if (Main.debug) {
         // if (i == 0) {
         // System.out.println("y: " + (yMain + posY));
-        imageArray[i][4] = y;
+        imageArray[i][5] = y;
         // System.out.println("x: " + (xMain + posX));
-        imageArray[i][5] = x;
+        imageArray[i][6] = x;
         // System.out.println("diry: " + viewPlane[i][1]);
         // imageArray[i][5] = viewPlane[i][1];
         // System.out.println("dirx: " + viewPlane[i][2]);
         // imageArray[i][6] = viewPlane[i][2];
         // System.out.println("angle: " + (viewPlane[i][0] * 180) / Math.PI);
-        imageArray[i][6] = (viewPlane[i][0] * 180) / Math.PI;
+        imageArray[i][7] = (viewPlane[i][0] * 180) / Math.PI;
         // System.out.println("posx: " + posX);
-        imageArray[i][7] = this.posX;
+        imageArray[i][8] = this.posX;
         // System.out.println("posy: " + posY);
-        imageArray[i][8] = this.posY;
+        imageArray[i][9] = this.posY;
         // System.out.println("colour: " + worldMap[y][x]);
-        imageArray[i][9] = worldMap[y][x];
+        imageArray[i][10] = worldMap[y][x];
         // System.out.println("xMain: " + xMain);
         // imageArray[i][11] = xMain;
         // System.out.println("yMain: " + yMain);
@@ -172,7 +189,7 @@ public class Player {
         // imageArray[i][2] is for the angle between the ray and the player direction
         // this is used for fisheye correction.
       }
-      imageArray[i][0] = Math.min(hypX, hypY);
+
       if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
         imageArray[i][1] = worldMap[y][x];
       }

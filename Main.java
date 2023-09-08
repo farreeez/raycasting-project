@@ -6,12 +6,13 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import javax.swing.*;
 
 public class Main extends JPanel implements KeyListener, ActionListener {
-  private static int screenWidth = 1280;
-  private static int screenHeight = 720;
+  private static int screenWidth = 640;
+  private static int screenHeight = 360;
   private int res = screenWidth - 17;
   public static boolean debug = false;
   // private int res = screenWidth - 17;
@@ -106,47 +107,39 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     super.paintComponent(g);
     int screenWidth = Main.screenWidth - 17;
     double[][] imageArray = player.ddaCaster();
-    // System.out.println("y: "+imageArray[100][2]);
-    // System.out.println("x: "+imageArray[100][3]);
-    // System.out.println("angle: "+imageArray[100][1]);
     for (int i = 0; i < imageArray.length; i++) {
       double originalDistance = imageArray[i][0];
-      if (originalDistance < 1) {
-        originalDistance = 1;
-      }
       double factor = 0;
       if (imageArray[i][1] != 0) {
         factor = imageArray[i][3] / Math.pow(originalDistance, 0.2);
       }
-      // if(!(imageArray[i][0] > 0 && imageArray[i][0] < 7)){
-      // factor = 0;
+
+      // if (imageArray[i][1] == 2) {
+      // color = Color.GREEN;
+      // } else if (imageArray[i][1] == 3) {
+      // color = Color.RED;
+      // } else if (imageArray[i][1] == 1) {
+      // color = Color.BLUE;
       // }
-      Color color = Color.GRAY;
-      if (imageArray[i][1] == 2) {
-        color = Color.GREEN;
-        // System.out.println("green: x: " + imageArray[i][2] + " y: " +
-        // imageArray[i][3]);
-      } else if (imageArray[i][1] == 3) {
-        color = Color.RED;
-        // System.out.println("red: x: " + imageArray[i][2] + " y: " +
-        // imageArray[i][3]);
-      } else if (imageArray[i][1] == 1) {
-        color = Color.BLUE;
-        // System.out.println("blue: x: " + imageArray[i][2] + " y: " +
-        // imageArray[i][3]);
-      }
-      if (imageArray[i][1] != 0) {
-        g.setColor(adjustColorBrightness(color, factor));
-      } else {
-        g.setColor(color);
-      }
+
+      List<BufferedImage> textures = World.getTextures();
+      BufferedImage image = textures.get(0);
+
       double distance = Math.cos(imageArray[i][2]) * originalDistance;
-      int height = (int) Math.round(((double) screenHeight - 40) / Math.pow(distance, 0.8));
+      double distanceFactor = Math.pow(distance, 0.8);
+      if (distanceFactor < 1) {
+        distanceFactor = 1;
+      }
+      int height = (int) Math.round(((double) screenHeight - 40) / distanceFactor);
       int startingHeight = (screenHeight - 40 - height) / 2;
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
-      int heightFactor = height / screenHeight;
-      // g.drawRect(width * i, startingHeight, width, height);
       for (int j = 0; j < height; j++) {
+        Color color = new Color(image.getRGB((int) Math.round(imageArray[i][4] * screenWidth), j));
+        if (imageArray[i][1] != 0) {
+          g.setColor(adjustColorBrightness(color, factor));
+        } else {
+          g.setColor(color);
+        }
         g.drawLine(width * i, startingHeight + j, width * (i + 1), startingHeight + j);
       }
       if (debug) {

@@ -1,3 +1,10 @@
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
 public class World {
     private static int worldMap[][] = {
             { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -26,7 +33,26 @@ public class World {
             { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
     };
 
-    public static int[][] getMap(){
+    private static List<BufferedImage> textures = new ArrayList<>();
+    private static boolean unloaded = true;
+
+    private static void LoadTextures() {
+        if (unloaded) {
+            try {
+                textures.add(
+                        ImageIO.read(
+                                new File("C:\\Users\\Fares\\Desktop\\projects\\Raycasting Game\\textures\\1.png")));
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public static int[][] getMap() {
         return worldMap;
+    }
+
+    public static List<BufferedImage> getTextures() {
+        LoadTextures();
+        return textures;
     }
 }
