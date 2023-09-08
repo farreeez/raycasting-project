@@ -54,6 +54,8 @@ public class Player {
     return viewPlane[(res - 1) / 2][0];
   }
 
+  int fakeCount = 0;
+
   public double[][] ddaCaster() {
     double[][] imageArray = new double[res][5];
     if (Main.debug) {
@@ -143,21 +145,23 @@ public class Player {
         count++;
       }
 
-      if ((viewPlane[i][0] <= (3 / 4) * Math.PI && viewPlane[i][0] >= (1 / 4) * Math.PI)
-          || (viewPlane[i][0] >= -(3 / 4) * Math.PI && viewPlane[i][0] <= -(1 / 4) * Math.PI) ||
-          (viewPlane[i][0] >= -(7 / 4) * Math.PI && viewPlane[i][0] <= -(5 / 4) * Math.PI) ||
-          (viewPlane[i][0] <= (7 / 4) * Math.PI && viewPlane[i][0] >= (5 / 4) * Math.PI)) {
-      }
-
       imageArray[i][0] = Math.min(hypX, hypY);
-      if (imageArray[i][3] == 1) {
+      if (imageArray[i][3] == 0.5) {
         // y
+        // System.out.println("y");w
+
         double opposite = Math.tan(viewPlane[i][0]) * imageArray[i][0];
-        imageArray[i][4] = (opposite + posX) - Math.floor(opposite + posX);
+        int sign = -1;
+        if (x < this.posX) {
+          sign = 1;
+        }
+        imageArray[i][4] = (opposite + sign * this.posY) - Math.floor(opposite + sign * this.posY);
+        // System.out.println(viewPlane[(res-1)/2][0]);
       } else {
         // x
+        // System.out.println("x");
         double adjacent = Math.cos(viewPlane[i][0]) * imageArray[i][0];
-        imageArray[i][4] = (adjacent + posX) - Math.floor(adjacent + posX);
+        imageArray[i][4] = (adjacent + this.posX) - Math.floor(adjacent + this.posX);
       }
 
       if (Main.debug) {

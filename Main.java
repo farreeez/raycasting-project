@@ -11,8 +11,8 @@ import java.util.List;
 import javax.swing.*;
 
 public class Main extends JPanel implements KeyListener, ActionListener {
-  private static int screenWidth = 640;
-  private static int screenHeight = 360;
+  private static int screenWidth = 1280;
+  private static int screenHeight = 720;
   private int res = screenWidth - 17;
   public static boolean debug = false;
   // private int res = screenWidth - 17;
@@ -127,14 +127,16 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
       double distance = Math.cos(imageArray[i][2]) * originalDistance;
       double distanceFactor = Math.pow(distance, 0.8);
+      // Color color = Color.black;
       if (distanceFactor < 1) {
         distanceFactor = 1;
       }
       int height = (int) Math.round(((double) screenHeight - 40) / distanceFactor);
       int startingHeight = (screenHeight - 40 - height) / 2;
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
+      int textureFactor = screenHeight/height;
       for (int j = 0; j < height; j++) {
-        Color color = new Color(image.getRGB((int) Math.round(imageArray[i][4] * screenWidth), j));
+        Color color = new Color(image.getRGB((int) Math.floor(imageArray[i][4] * screenWidth), j * textureFactor));
         if (imageArray[i][1] != 0) {
           g.setColor(adjustColorBrightness(color, factor));
         } else {
