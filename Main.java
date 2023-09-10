@@ -107,6 +107,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     super.paintComponent(g);
     int screenWidth = Main.screenWidth - 17;
     double[][] imageArray = player.ddaCaster();
+    List<BufferedImage> textures = World.getTextures();
     for (int i = 0; i < imageArray.length; i++) {
       double originalDistance = imageArray[i][0];
       double factor = 0;
@@ -122,21 +123,23 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       // color = Color.BLUE;
       // }
 
-      List<BufferedImage> textures = World.getTextures();
       BufferedImage image = textures.get(0);
 
       double distance = Math.cos(imageArray[i][2]) * originalDistance;
+      if (distance < 1) {
+        distance = 1;
+      }
       double distanceFactor = Math.pow(distance, 0.8);
       // Color color = Color.black;
-      if (distanceFactor < 1) {
-        distanceFactor = 1;
-      }
       int height = (int) Math.round(((double) screenHeight - 40) / distanceFactor);
       int startingHeight = (screenHeight - 40 - height) / 2;
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
-      int textureFactor = screenHeight/height;
+      double textureFactorFraction = 0;
+      if (height != 0) {
+        textureFactorFraction = ((double) screenHeight) / height;
+      }
       for (int j = 0; j < height; j++) {
-        Color color = new Color(image.getRGB((int) Math.floor(imageArray[i][4] * screenWidth), j * textureFactor));
+        Color color = new Color(image.getRGB((int) Math.floor(imageArray[i][4] * screenWidth), (int) (j * textureFactorFraction)));
         if (imageArray[i][1] != 0) {
           g.setColor(adjustColorBrightness(color, factor));
         } else {

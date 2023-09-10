@@ -148,50 +148,21 @@ public class Player {
       imageArray[i][0] = Math.min(hypX, hypY);
       if (imageArray[i][3] == 0.5) {
         // y
-        // System.out.println("y");w
-
-        double opposite = Math.tan(viewPlane[i][0]) * imageArray[i][0];
-        int sign = -1;
-        if (x < this.posX) {
-          sign = 1;
-        }
-        imageArray[i][4] = (opposite + sign * this.posY) - Math.floor(opposite + sign * this.posY);
-        // System.out.println(viewPlane[(res-1)/2][0]);
+        double opposite = Math.sin(viewPlane[i][0]) * imageArray[i][0];
+        imageArray[i][4] = (opposite - this.posY) - Math.floor(opposite - this.posY);
       } else {
         // x
-        // System.out.println("x");
         double adjacent = Math.cos(viewPlane[i][0]) * imageArray[i][0];
         imageArray[i][4] = (adjacent + this.posX) - Math.floor(adjacent + this.posX);
       }
 
       if (Main.debug) {
-        // if (i == 0) {
-        // System.out.println("y: " + (yMain + posY));
         imageArray[i][5] = y;
-        // System.out.println("x: " + (xMain + posX));
         imageArray[i][6] = x;
-        // System.out.println("diry: " + viewPlane[i][1]);
-        // imageArray[i][5] = viewPlane[i][1];
-        // System.out.println("dirx: " + viewPlane[i][2]);
-        // imageArray[i][6] = viewPlane[i][2];
-        // System.out.println("angle: " + (viewPlane[i][0] * 180) / Math.PI);
         imageArray[i][7] = (viewPlane[i][0] * 180) / Math.PI;
-        // System.out.println("posx: " + posX);
         imageArray[i][8] = this.posX;
-        // System.out.println("posy: " + posY);
         imageArray[i][9] = this.posY;
-        // System.out.println("colour: " + worldMap[y][x]);
         imageArray[i][10] = worldMap[y][x];
-        // System.out.println("xMain: " + xMain);
-        // imageArray[i][11] = xMain;
-        // System.out.println("yMain: " + yMain);
-        // imageArray[i][12] = yMain;
-        // System.out.println("-------------------------------------------------------------------");
-        // }
-
-        // imageArray[i][1] is for colour.
-        // imageArray[i][2] is for the angle between the ray and the player direction
-        // this is used for fisheye correction.
       }
 
       if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
