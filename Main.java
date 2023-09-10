@@ -15,7 +15,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenHeight = 720;
   private int res = screenWidth - 17;
   public static boolean debug = false;
-  // private int res = screenWidth - 17;
   private Player player;
   private Timer timer;
   public static boolean forward = false;
@@ -74,8 +73,9 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       public void mouseMoved(MouseEvent e) {
         if (mouseLock) {
           double factor = 50 / (double) centreX;
-          player.mouseAim(factor * (centreX - e.getXOnScreen()));
-          robot.mouseMove(centreX, centreY);
+          Point location = frame.getLocation();
+          player.mouseAim(factor * (location.x + centreX - e.getXOnScreen()));
+          robot.mouseMove(location.x + centreX, location.y + centreY);
         }
       }
     });
@@ -131,15 +131,18 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
       double distanceFactor = Math.pow(distance, 0.8);
       // Color color = Color.black;
-      int height = (int) Math.round(((double) screenHeight - 40) / distanceFactor);
+      int textureHeight = image.getHeight();
+      int height = (int) Math.round(textureHeight / distanceFactor);
+      int textureWidth = image.getWidth();
       int startingHeight = (screenHeight - 40 - height) / 2;
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
       double textureFactorFraction = 0;
       if (height != 0) {
-        textureFactorFraction = ((double) screenHeight) / height;
+        textureFactorFraction = ((double) textureHeight) / height;
       }
       for (int j = 0; j < height; j++) {
-        Color color = new Color(image.getRGB((int) Math.floor(imageArray[i][4] * screenWidth), (int) (j * textureFactorFraction)));
+        Color color = new Color(
+            image.getRGB((int) Math.floor(imageArray[i][4] * textureWidth), (int) (j * textureFactorFraction)));
         if (imageArray[i][1] != 0) {
           g.setColor(adjustColorBrightness(color, factor));
         } else {
@@ -161,10 +164,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     }
 
     int[][] worldMap = player.getMap();
-    int width = (int) Math.round((double) screenWidth / 6);
+    int width = (int) Math.floor((double) screenWidth / 6);
     int height = (worldMap.length / worldMap[0].length) * width;
-    int smallWidth = (int) Math.round((double) width / worldMap[0].length);
-    int smallHeight = (int) Math.round((double) height / worldMap.length);
+    int smallWidth = (int) Math.floor((double) width / worldMap[0].length);
+    int smallHeight = (int) Math.floor((double) height / worldMap.length);
 
     for (int i = 0; i < worldMap.length; i++) {
       for (int j = 0; j < worldMap[i].length; j++) {
@@ -195,6 +198,11 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     int playerPeekY = playerPosY + (int) (radius / 2 * Math.cos(angle)) + radius / 4;
     g.setColor(Color.BLUE);
     g.fillOval(playerPeekX, playerPeekY, radius / 2, radius / 2);
+
+    g.setColor(Color.blue);
+
+    int crosairSize = 24;
+    g.fillRect(screenWidth / 2 - crosairSize / 2, screenHeight / 2 - crosairSize, crosairSize, crosairSize);
   }
 
   private static Color adjustColorBrightness(Color color, double factor) {
@@ -260,9 +268,9 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       fullscreen = !fullscreen;
     } else if (keyCode == KeyEvent.VK_F2) {
       if (mouseLock) {
-        setCursor(originalCursor);
+      setCursor(originalCursor);
       } else {
-        setCursor(blankCursor);
+      setCursor(blankCursor);
       }
       mouseLock = !mouseLock;
     }
