@@ -15,8 +15,6 @@ public class Player {
   private double fov = 90;
   private double inc;
   private double[][] viewPlane;
-  private double hypX = 0;
-  private double hypY = 0;
   private int[][] worldMap = World.getMap();
 
   public Player(int res) {
@@ -56,133 +54,137 @@ public class Player {
 
   int fakeCount = 0;
 
+  private double[] ddaCasterHelper(int i, double orgPosX, double orgPosY) {
+    double[] imageArray = new double[11];
+    double hypX = 1000000000;
+    double hypY = 1000000000;
+    double yStep = 0;
+    double xStep = 0;
+    double xMain = 0;
+    double yMain = 0;
+    int roundingValue = 32;
+    double posX = orgPosX * roundingValue;
+    double posY = orgPosY * roundingValue;
+    boolean noBoundary = true;
+    int count = 0;
+    int xCount = 0;
+    int y = 0;
+    int x = 0;
+    // viewPlane[i][1] is dirY
+    // viewPlane[i][2] is dirX
+    while (noBoundary && count < 2000) {
+      // code for the ray to calculate the x boundaries
+      boolean allowed = true;
+      if (viewPlane[i][1] != 0) {
+        if (count == 0) {
+          hypX = 0;
+        }
+        if (hypX <= hypY) {
+          // if the position of the player is not on the edges
+          if (count == 0) {
+            // calculates the length of the step that is needed to reach the closest edge.
+            double posYfloor = Math.floor(posY);
+            if (viewPlane[i][1] > 0) {
+              yStep = -(posY - posYfloor);
+            } else {
+              yStep = (1 - (posY - posYfloor));
+            }
+          } else {
+            // adds or subtracts one from yStep depending on the direction of
+            // viewPlane[i][1] to reach
+            // the next edge
+            yStep += getSign(viewPlane[i][1]) * -1;
+          }
+          // calculates the hypotinuse and the x factor that the line moves by.
+          hypX =
+              Math.abs(yStep)
+                  * Math.sqrt(1 + Math.pow(viewPlane[i][2] / viewPlane[i][1], 2))
+                  / roundingValue;
+          allowed = false;
+        }
+      }
+
+      if (viewPlane[i][2] != 0) {
+        if (count == 0) {
+          hypY = 0;
+        }
+        if ((hypY <= hypX && allowed) || xCount == 0) {
+          if (xCount == 0) {
+            double posXfloor = Math.floor(posX);
+            if (viewPlane[i][2] < 0) {
+              xStep = -(posX - posXfloor);
+            } else {
+              xStep = 1 - (posX - posXfloor);
+            }
+          } else {
+            xStep += getSign(viewPlane[i][2]);
+          }
+          hypY =
+              Math.abs(xStep)
+                  * Math.sqrt(1 + Math.pow(viewPlane[i][1] / viewPlane[i][2], 2))
+                  / roundingValue;
+          xCount++;
+        }
+      }
+
+      if (hypX < hypY) {
+        yMain = yStep;
+        imageArray[3] = 1;
+      } else if (hypY < hypX) {
+        xMain = xStep;
+        imageArray[3] = 0.5;
+      }
+
+      y = (int) Math.round((yMain + posY) / roundingValue);
+      x = (int) Math.round((xMain + posX) / roundingValue);
+      if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
+        if (worldMap[y][x] != 0) {
+          noBoundary = false;
+        }
+      }
+      count++;
+    }
+
+    imageArray[0] = Math.min(hypX, hypY);
+    if (imageArray[3] == 0.5) {
+      // y
+      double opposite = Math.sin(viewPlane[i][0]) * imageArray[0];
+      imageArray[4] = (opposite - orgPosY) - Math.floor(opposite - orgPosY);
+    } else {
+      // x
+      double adjacent = Math.cos(viewPlane[i][0]) * imageArray[0];
+      imageArray[4] = (adjacent + orgPosX) - Math.floor(adjacent + orgPosX);
+    }
+
+    imageArray[7] = (viewPlane[i][0] * 180) / Math.PI;
+
+    if (Main.debug) {
+      imageArray[5] = y;
+      imageArray[6] = x;
+      imageArray[8] = orgPosX;
+      imageArray[9] = orgPosY;
+      imageArray[10] = worldMap[y][x];
+    }
+
+    if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
+      imageArray[1] = worldMap[y][x];
+    }
+    imageArray[2] = viewPlane[(res - 1) / 2][0] - viewPlane[i][0];
+    if (imageArray[2] < 0) {
+      imageArray[2] += 2 * Math.PI;
+    } else if (imageArray[2] > 2 * Math.PI) {
+      imageArray[2] -= 2 * Math.PI;
+    }
+    return imageArray;
+  }
+
   public double[][] ddaCaster() {
     double[][] imageArray = new double[res][5];
     if (Main.debug) {
       imageArray = new double[res][11];
     }
     for (int i = 0; i < viewPlane.length; i++) {
-      hypX = 1000000000;
-      hypY = 1000000000;
-      double yStep = 0;
-      double xStep = 0;
-      double xMain = 0;
-      double yMain = 0;
-      int roundingValue = 32;
-      double posX = this.posX * roundingValue;
-      double posY = this.posY * roundingValue;
-      boolean noBoundary = true;
-      int count = 0;
-      int xCount = 0;
-      int y = 0;
-      int x = 0;
-      // viewPlane[i][1] is dirY
-      // viewPlane[i][2] is dirX
-      while (noBoundary && count < 2000) {
-        // code for the ray to calculate the x boundaries
-        boolean allowed = true;
-        if (viewPlane[i][1] != 0) {
-          if (count == 0) {
-            hypX = 0;
-          }
-          if (hypX <= hypY) {
-            // if the position of the player is not on the edges
-            if (count == 0) {
-              // calculates the length of the step that is needed to reach the closest edge.
-              double posYfloor = Math.floor(posY);
-              if (viewPlane[i][1] > 0) {
-                yStep = -(posY - posYfloor);
-              } else {
-                yStep = (1 - (posY - posYfloor));
-              }
-            } else {
-              // adds or subtracts one from yStep depending on the direction of
-              // viewPlane[i][1] to reach
-              // the next edge
-              yStep += getSign(viewPlane[i][1]) * -1;
-            }
-            // calculates the hypotinuse and the x factor that the line moves by.
-            hypX =
-                Math.abs(yStep)
-                    * Math.sqrt(1 + Math.pow(viewPlane[i][2] / viewPlane[i][1], 2))
-                    / roundingValue;
-            allowed = false;
-          }
-        }
-
-        if (viewPlane[i][2] != 0) {
-          if (count == 0) {
-            hypY = 0;
-          }
-          if ((hypY <= hypX && allowed) || xCount == 0) {
-            if (xCount == 0) {
-              double posXfloor = Math.floor(posX);
-              if (viewPlane[i][2] < 0) {
-                xStep = -(posX - posXfloor);
-              } else {
-                xStep = 1 - (posX - posXfloor);
-              }
-            } else {
-              xStep += getSign(viewPlane[i][2]);
-            }
-            hypY =
-                Math.abs(xStep)
-                    * Math.sqrt(1 + Math.pow(viewPlane[i][1] / viewPlane[i][2], 2))
-                    / roundingValue;
-            xCount++;
-          }
-        }
-
-        if (hypX < hypY) {
-          yMain = yStep;
-          imageArray[i][3] = 1;
-        } else if (hypY < hypX) {
-          xMain = xStep;
-          imageArray[i][3] = 0.5;
-        }
-
-        y = (int) Math.round((yMain + posY) / roundingValue);
-        x = (int) Math.round((xMain + posX) / roundingValue);
-        if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
-          if (worldMap[y][x] != 0) {
-            noBoundary = false;
-          }
-        }
-        count++;
-      }
-
-      imageArray[i][0] = Math.min(hypX, hypY);
-      if(imageArray[i][0] < 1){
-        imageArray[i][0] = 1;
-      }
-      if (imageArray[i][3] == 0.5) {
-        // y
-        double opposite = Math.sin(viewPlane[i][0]) * imageArray[i][0];
-        imageArray[i][4] = (opposite - this.posY) - Math.floor(opposite - this.posY);
-      } else {
-        // x
-        double adjacent = Math.cos(viewPlane[i][0]) * imageArray[i][0];
-        imageArray[i][4] = (adjacent + this.posX) - Math.floor(adjacent + this.posX);
-      }
-
-      if (Main.debug) {
-        imageArray[i][5] = y;
-        imageArray[i][6] = x;
-        imageArray[i][7] = (viewPlane[i][0] * 180) / Math.PI;
-        imageArray[i][8] = this.posX;
-        imageArray[i][9] = this.posY;
-        imageArray[i][10] = worldMap[y][x];
-      }
-
-      if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
-        imageArray[i][1] = worldMap[y][x];
-      }
-      imageArray[i][2] = viewPlane[(res - 1) / 2][0] - viewPlane[i][0];
-      if (imageArray[i][2] < 0) {
-        imageArray[i][2] += 2 * Math.PI;
-      } else if (imageArray[i][2] > 2 * Math.PI) {
-        imageArray[i][2] -= 2 * Math.PI;
-      }
+      imageArray[i] = ddaCasterHelper(i, this.posX, this.posY);
     }
     return imageArray;
   }
@@ -350,61 +352,38 @@ public class Player {
     int y = (int) Math.round(posY);
     int x = (int) Math.round(posX);
 
-    // int currentX = (int) Math.round(this.posX);
+    int currentX = (int) Math.round(this.posX);
 
-    // int sign = -1;
-
-    // if (posY > this.posY) {
-    //   sign = 1;
-    // }
-
-    // if (posY >= 0) {
-    //   if ((y + sign) < worldMap.length
-    //       && (y + sign) >= 0
-    //       && worldMap[y + sign][currentX] != 0
-    //       && y + sign - posY < 0.7) {
-    //   } else if (y < worldMap.length && worldMap[y][currentX] == 0) {
-    //     this.posY = posY;
-    //   }
-    // }
-
-    if (posY >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
-      this.posY = posY;
+    if (posY >= 0) {
+      if (y < worldMap.length
+          && worldMap[y][currentX] == 0
+          && ddaCasterHelper((res - 1) / 2, this.posX, posY)[0] > 0.2) {
+        this.posY = posY;
+      }
     }
 
-    // int currentY = (int) Math.round(this.posY);
-    // sign = -1;
 
-    // if (posX > this.posX) {
-    //   sign = 1;
-    // }
-
-    // if (posX >= 0) {
-    //   if ((x + sign) < worldMap[currentY].length
-    //       && x + sign >= 0
-    //       && worldMap[currentY][x + sign] != 0
-    //       && (x + sign) - posX < 0.7) {
-    //   } else if (x < worldMap[(int) Math.round(this.posY)].length
-    //       && worldMap[(int) Math.round(this.posY)][x] == 0) {
-    //     this.posX = posX;
-    //   }
-    // }
-
-    if (posX >= 0
-        && x < worldMap[(int) Math.round(this.posY)].length
-        && worldMap[(int) Math.round(this.posY)][x] == 0) {
-      this.posX = posX;
+    if (posX >= 0) {
+      if (x < worldMap[(int) Math.round(this.posY)].length
+          && worldMap[(int) Math.round(this.posY)][x] == 0
+          && ddaCasterHelper((res - 1) / 2, this.posX, posY)[0] > 0.2) {
+        this.posX = posX;
+      }
     }
+
+    // if (posX >= 0
+    //     && x < worldMap[(int) Math.round(this.posY)].length
+    //     && worldMap[(int) Math.round(this.posY)][x] == 0) {
+    //   this.posX = posX;
+    // }
   }
 
-  private boolean distCheck(double x1, double y1, int x2, int y2) {
-    double distance = 0;
+  // private double distCalc(double x1, double y1, int x2, int y2) {
+  //   double distance = 0;
 
-    distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  //   distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  //   System.out.println(distance);
 
-    if (distance >= 0.5) {
-      return false;
-    }
-    return true;
-  }
+  //   return distance;
+  // }
 }

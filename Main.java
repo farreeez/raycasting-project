@@ -7,13 +7,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.util.List;
-
 import javax.swing.*;
 
 public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenWidth = 1280;
   private static int screenHeight = 720;
-  private int res = Math.round(screenWidth/4);
+  private int res = Math.round(screenWidth / 3);
   public static boolean debug = false;
   private Player player;
   private Timer timer;
@@ -29,8 +28,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private boolean mvLeft = true;
   private boolean rtRight = true;
   private boolean rtLeft = true;
-  private static GraphicsDevice device = GraphicsEnvironment
-      .getLocalGraphicsEnvironment().getScreenDevices()[0];
+  private static GraphicsDevice device =
+      GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
   private boolean fullscreen = false;
   private static JFrame frame;
   private int centreX;
@@ -61,24 +60,25 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 
     // Create a new blank cursor.
-    blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-        cursorImg, new Point(0, 0), "blank cursor");
+    blankCursor =
+        Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
 
     originalCursor = getCursor();
 
     centreX = screenWidth / 2;
     centreY = screenHeight / 2;
-    this.addMouseMotionListener(new MouseMotionAdapter() {
-      @Override
-      public void mouseMoved(MouseEvent e) {
-        if (mouseLock) {
-          double factor = 50 / (double) centreX;
-          Point location = frame.getLocation();
-          player.mouseAim(factor * (location.x + centreX - e.getXOnScreen()));
-          robot.mouseMove(location.x + centreX, location.y + centreY);
-        }
-      }
-    });
+    this.addMouseMotionListener(
+        new MouseMotionAdapter() {
+          @Override
+          public void mouseMoved(MouseEvent e) {
+            if (mouseLock) {
+              double factor = 50 / (double) centreX;
+              Point location = frame.getLocation();
+              player.mouseAim(factor * (location.x + centreX - e.getXOnScreen()));
+              robot.mouseMove(location.x + centreX, location.y + centreY);
+            }
+          }
+        });
   }
 
   public static void main(String[] args) {
@@ -115,6 +115,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         factor = imageArray[i][3] / Math.pow(originalDistance, 0.2);
       }
 
+      factor = Math.min(factor, 1.3);
+
       // if (imageArray[i][1] == 2) {
       // color = Color.GREEN;
       // } else if (imageArray[i][1] == 3) {
@@ -126,39 +128,65 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       BufferedImage image = textures.get(0);
 
       double distance = Math.cos(imageArray[i][2]) * originalDistance;
+
+      double distanceFactor = Math.pow(distance, 0.8);
       if (distance < 1) {
         distance = 1;
       }
-      double distanceFactor = Math.pow(distance, 0.8);
+
       // Color color = Color.black;
       int textureHeight = image.getHeight();
       int height = (int) Math.round(textureHeight / distanceFactor);
       int textureWidth = image.getWidth();
-      int startingHeight = (screenHeight - 40 - height) / 2;
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
+      double xTexture = imageArray[i][4];
+      if (imageArray[i][3] == 1) {
+        if (imageArray[i][7] > 180) {
+          xTexture = 1 - xTexture;
+        }
+      } else {
+        if (imageArray[i][7] < 90 || imageArray[i][7] > 270) {
+          xTexture = 1 - xTexture;
+        }
+      }
+
+      if(xTexture == 1){
+        xTexture = 0.99;
+      }
+
       double textureFactorFraction = 0;
       if (height != 0) {
         textureFactorFraction = ((double) textureHeight) / height;
       }
-      for (int j = 0; j < height; j++) {
-        Color color = new Color(
-            image.getRGB((int) Math.floor(imageArray[i][4] * textureWidth), (int) (j * textureFactorFraction)));
+      int startingHeight = (screenHeight - 40 - height) / 2;
+      int start = 0;
+      if (startingHeight < 0) {
+        start = startingHeight * -1;
+      }
+      for (int j = start; j < height; j++) {
+        Color color =
+            new Color(
+                image.getRGB(
+                    (int) Math.floor(xTexture * textureWidth), (int) (j * textureFactorFraction)));
         if (imageArray[i][1] != 0) {
           g.setColor(adjustColorBrightness(color, factor));
         } else {
           g.setColor(color);
         }
         g.drawLine(width * i, startingHeight + j, width * (i + 1), startingHeight + j);
+        if ((startingHeight + j) > screenHeight - 40) {
+          break;
+        }
       }
       if (debug) {
         g.setColor(Color.WHITE);
         g.setFont(g.getFont().deriveFont(24, 17.0f));
-        g.drawString("y: " + rounder(imageArray[i][4]), width * (i), 100);
-        g.drawString("x: " + rounder(imageArray[i][5]), width * (i), 200);
-        g.drawString("ang: " + rounder(imageArray[i][6]), width * (i), 300);
-        g.drawString("x: " + rounder(imageArray[i][7]), width * (i), 400);
-        g.drawString("y: " + rounder(imageArray[i][8]), width * (i), 500);
-        // g.drawString("colour: " + rounder(imageArray[i][9]), width * (i), 600);
+        g.drawString("y: " + rounder(imageArray[i][5]), width * (i), 100);
+        g.drawString("x: " + rounder(imageArray[i][6]), width * (i), 200);
+        // g.drawString("ang: " + rounder(imageArray[i][7]), width * (i), 300);
+        g.drawString("x: " + rounder(imageArray[i][8]), width * (i), 400);
+        g.drawString("y: " + rounder(imageArray[i][9]), width * (i), 500);
+        // g.drawString("colour: " + rounder(imageArray[i][10]), width * (i), 600);
         g.drawString("d: " + rounder(imageArray[i][0]), width * i, 600);
       }
     }
@@ -182,7 +210,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           color = Color.GRAY;
         }
         g.setColor(color);
-        g.fillRect(screenWidth - width + 1 + smallWidth * j, smallHeight * i, smallWidth, smallHeight);
+        g.fillRect(
+            screenWidth - width + 1 + smallWidth * j, smallHeight * i, smallWidth, smallHeight);
       }
     }
 
@@ -202,7 +231,11 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     g.setColor(Color.blue);
 
     int crosairSize = 24;
-    g.fillRect(screenWidth / 2 - crosairSize / 2, screenHeight / 2 - crosairSize, crosairSize, crosairSize);
+    g.fillRect(
+        screenWidth / 2 - crosairSize / 2,
+        screenHeight / 2 - crosairSize,
+        crosairSize,
+        crosairSize);
   }
 
   private static Color adjustColorBrightness(Color color, double factor) {
@@ -268,17 +301,16 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       fullscreen = !fullscreen;
     } else if (keyCode == KeyEvent.VK_F2) {
       if (mouseLock) {
-      setCursor(originalCursor);
+        setCursor(originalCursor);
       } else {
-      setCursor(blankCursor);
+        setCursor(blankCursor);
       }
       mouseLock = !mouseLock;
     }
   }
 
   @Override
-  public void keyTyped(KeyEvent e) {
-  }
+  public void keyTyped(KeyEvent e) {}
 
   @Override
   public void keyReleased(KeyEvent e) {
