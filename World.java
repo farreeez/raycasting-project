@@ -41,7 +41,7 @@ public class World {
             try {
                 textures.add(
                         ImageIO.read(
-                                new File("C:\\Users\\Fares\\Desktop\\projects\\Raycasting Game\\textures\\1.png")));
+                                new File("C:\\Users\\Fares\\Desktop\\raycasting\\raycasting-project\\textures\\2.jpg")));
             } catch (Exception e) {
             }
             unloaded = false;

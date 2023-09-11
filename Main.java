@@ -13,7 +13,7 @@ import javax.swing.*;
 public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenWidth = 1280;
   private static int screenHeight = 720;
-  private int res = screenWidth - 17;
+  private int res = Math.round(screenWidth/4);
   public static boolean debug = false;
   private Player player;
   private Timer timer;
@@ -30,7 +30,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private boolean rtRight = true;
   private boolean rtLeft = true;
   private static GraphicsDevice device = GraphicsEnvironment
-      .getLocalGraphicsEnvironment().getScreenDevices()[1];
+      .getLocalGraphicsEnvironment().getScreenDevices()[0];
   private boolean fullscreen = false;
   private static JFrame frame;
   private int centreX;
@@ -158,8 +158,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         g.drawString("ang: " + rounder(imageArray[i][6]), width * (i), 300);
         g.drawString("x: " + rounder(imageArray[i][7]), width * (i), 400);
         g.drawString("y: " + rounder(imageArray[i][8]), width * (i), 500);
-        g.drawString("colour: " + rounder(imageArray[i][9]), width * (i), 600);
-        g.drawString("dist: " + rounder(imageArray[i][0]), width * i, 700);
+        // g.drawString("colour: " + rounder(imageArray[i][9]), width * (i), 600);
+        g.drawString("d: " + rounder(imageArray[i][0]), width * i, 600);
       }
     }
 

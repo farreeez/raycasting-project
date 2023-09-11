@@ -46,7 +46,7 @@ public class Player {
   }
 
   public double[] getPosition() {
-    double[] position = { posY, posX };
+    double[] position = {posY, posX};
     return position;
   }
 
@@ -102,7 +102,10 @@ public class Player {
               yStep += getSign(viewPlane[i][1]) * -1;
             }
             // calculates the hypotinuse and the x factor that the line moves by.
-            hypX = Math.abs(yStep) * Math.sqrt(1 + Math.pow(viewPlane[i][2] / viewPlane[i][1], 2)) / roundingValue;
+            hypX =
+                Math.abs(yStep)
+                    * Math.sqrt(1 + Math.pow(viewPlane[i][2] / viewPlane[i][1], 2))
+                    / roundingValue;
             allowed = false;
           }
         }
@@ -122,7 +125,10 @@ public class Player {
             } else {
               xStep += getSign(viewPlane[i][2]);
             }
-            hypY = Math.abs(xStep) * Math.sqrt(1 + Math.pow(viewPlane[i][1] / viewPlane[i][2], 2)) / roundingValue;
+            hypY =
+                Math.abs(xStep)
+                    * Math.sqrt(1 + Math.pow(viewPlane[i][1] / viewPlane[i][2], 2))
+                    / roundingValue;
             xCount++;
           }
         }
@@ -146,6 +152,9 @@ public class Player {
       }
 
       imageArray[i][0] = Math.min(hypX, hypY);
+      if(imageArray[i][0] < 1){
+        imageArray[i][0] = 1;
+      }
       if (imageArray[i][3] == 0.5) {
         // y
         double opposite = Math.sin(viewPlane[i][0]) * imageArray[i][0];
@@ -181,38 +190,40 @@ public class Player {
   // rotates the angle to the right
   public void rotateRight() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.rotateRight) {
-          for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] -= 0.017;
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.rotateRight) {
+              for (int i = 0; i < viewPlane.length; i++) {
+                viewPlane[i][0] -= 0.017;
+              }
+              changeDirection();
+            } else {
+              timer.cancel();
+            }
           }
-          changeDirection();
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
   // rotates the angle to the left
   public void rotateLeft() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.rotateLeft) {
-          for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] += 0.017;
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.rotateLeft) {
+              for (int i = 0; i < viewPlane.length; i++) {
+                viewPlane[i][0] += 0.017;
+              }
+              changeDirection();
+            } else {
+              timer.cancel();
+            }
           }
-          changeDirection();
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
@@ -230,7 +241,8 @@ public class Player {
   private void changeDirection() {
     // changeDirection(Math.PI / 4 + Math.PI);
     for (int i = 0; i < viewPlane.length; i++) {
-      viewPlane[i][0] = viewPlane[i][0] - Math.floor(viewPlane[i][0] / (2 * Math.PI)) * (2 * Math.PI);
+      viewPlane[i][0] =
+          viewPlane[i][0] - Math.floor(viewPlane[i][0] / (2 * Math.PI)) * (2 * Math.PI);
       if (viewPlane[i][0] > Math.PI || viewPlane[i][0] < 0) {
         viewPlane[i][1] = -1;
       } else {
@@ -250,65 +262,69 @@ public class Player {
 
   public void moveForward() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.forward) {
-          double angle = viewPlane[(res - 1) / 2][0];
-          move(angle);
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.forward) {
+              double angle = viewPlane[(res - 1) / 2][0];
+              move(angle);
+            } else {
+              timer.cancel();
+            }
+          }
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
   public void moveBack() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.backward) {
-          double angle = viewPlane[(res - 1) / 2][0] + Math.PI;
-          move(angle);
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.backward) {
+              double angle = viewPlane[(res - 1) / 2][0] + Math.PI;
+              move(angle);
+            } else {
+              timer.cancel();
+            }
+          }
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
   public void moveRight() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.right) {
-          double angle = viewPlane[(res - 1) / 2][0] - Math.PI / 2;
-          move(angle);
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.right) {
+              double angle = viewPlane[(res - 1) / 2][0] - Math.PI / 2;
+              move(angle);
+            } else {
+              timer.cancel();
+            }
+          }
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
   public void moveLeft() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.left) {
-          double angle = viewPlane[(res - 1) / 2][0] + Math.PI / 2;
-          move(angle);
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.left) {
+              double angle = viewPlane[(res - 1) / 2][0] + Math.PI / 2;
+              move(angle);
+            } else {
+              timer.cancel();
+            }
+          }
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
@@ -334,14 +350,61 @@ public class Player {
     int y = (int) Math.round(posY);
     int x = (int) Math.round(posX);
 
+    // int currentX = (int) Math.round(this.posX);
+
+    // int sign = -1;
+
+    // if (posY > this.posY) {
+    //   sign = 1;
+    // }
+
+    // if (posY >= 0) {
+    //   if ((y + sign) < worldMap.length
+    //       && (y + sign) >= 0
+    //       && worldMap[y + sign][currentX] != 0
+    //       && y + sign - posY < 0.7) {
+    //   } else if (y < worldMap.length && worldMap[y][currentX] == 0) {
+    //     this.posY = posY;
+    //   }
+    // }
+
     if (posY >= 0 && y < worldMap.length && worldMap[y][(int) Math.round(this.posX)] == 0) {
       this.posY = posY;
     }
 
-    if (posX >= 0 && x < worldMap[(int) Math.round(this.posY)].length
+    // int currentY = (int) Math.round(this.posY);
+    // sign = -1;
+
+    // if (posX > this.posX) {
+    //   sign = 1;
+    // }
+
+    // if (posX >= 0) {
+    //   if ((x + sign) < worldMap[currentY].length
+    //       && x + sign >= 0
+    //       && worldMap[currentY][x + sign] != 0
+    //       && (x + sign) - posX < 0.7) {
+    //   } else if (x < worldMap[(int) Math.round(this.posY)].length
+    //       && worldMap[(int) Math.round(this.posY)][x] == 0) {
+    //     this.posX = posX;
+    //   }
+    // }
+
+    if (posX >= 0
+        && x < worldMap[(int) Math.round(this.posY)].length
         && worldMap[(int) Math.round(this.posY)][x] == 0) {
       this.posX = posX;
     }
+  }
 
+  private boolean distCheck(double x1, double y1, int x2, int y2) {
+    double distance = 0;
+
+    distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+
+    if (distance >= 0.5) {
+      return false;
+    }
+    return true;
   }
 }
