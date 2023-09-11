@@ -354,28 +354,35 @@ public class Player {
 
     int currentX = (int) Math.round(this.posX);
 
+    // if (posY >= 0) {
+    //   if (y < worldMap.length
+    //       && worldMap[y][currentX] == 0
+    //       && ddaCasterHelper((res - 1) / 2, this.posX, posY)[0] > 0.2) {
+    //     this.posY = posY;
+    //   }
+    // }
+
     if (posY >= 0) {
       if (y < worldMap.length
-          && worldMap[y][currentX] == 0
-          && ddaCasterHelper((res - 1) / 2, this.posX, posY)[0] > 0.2) {
+          && worldMap[y][currentX] == 0) {
         this.posY = posY;
       }
     }
 
 
-    if (posX >= 0) {
-      if (x < worldMap[(int) Math.round(this.posY)].length
-          && worldMap[(int) Math.round(this.posY)][x] == 0
-          && ddaCasterHelper((res - 1) / 2, this.posX, posY)[0] > 0.2) {
-        this.posX = posX;
-      }
-    }
-
-    // if (posX >= 0
-    //     && x < worldMap[(int) Math.round(this.posY)].length
-    //     && worldMap[(int) Math.round(this.posY)][x] == 0) {
-    //   this.posX = posX;
+    // if (posX >= 0) {
+    //   if (x < worldMap[(int) Math.round(this.posY)].length
+    //       && worldMap[(int) Math.round(this.posY)][x] == 0
+    //       && ddaCasterHelper((res - 1) / 2, this.posX, posY)[0] > 0.2) {
+    //     this.posX = posX;
+    //   }
     // }
+
+    if (posX >= 0
+        && x < worldMap[(int) Math.round(this.posY)].length
+        && worldMap[(int) Math.round(this.posY)][x] == 0) {
+      this.posX = posX;
+    }
   }
 
   // private double distCalc(double x1, double y1, int x2, int y2) {

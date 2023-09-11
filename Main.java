@@ -150,9 +150,9 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         }
       }
 
-      if(xTexture == 1){
-        xTexture = 0.99;
-      }
+      // if(xTexture == 1){
+      //   xTexture = 0.99;
+      // }
 
       double textureFactorFraction = 0;
       if (height != 0) {
