@@ -157,12 +157,12 @@ public class Player {
     }
 
     imageArray[7] = (viewPlane[i][0] * 180) / Math.PI;
+    imageArray[8] = orgPosX;
+    imageArray[9] = orgPosY;
 
     if (Main.debug) {
       imageArray[5] = y;
       imageArray[6] = x;
-      imageArray[8] = orgPosX;
-      imageArray[9] = orgPosY;
       imageArray[10] = worldMap[y][x];
     }
 
@@ -363,12 +363,10 @@ public class Player {
     // }
 
     if (posY >= 0) {
-      if (y < worldMap.length
-          && worldMap[y][currentX] == 0) {
+      if (y < worldMap.length && worldMap[y][currentX] == 0) {
         this.posY = posY;
       }
     }
-
 
     // if (posX >= 0) {
     //   if (x < worldMap[(int) Math.round(this.posY)].length

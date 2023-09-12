@@ -10,7 +10,7 @@ import java.util.List;
 import javax.swing.*;
 
 public class Main extends JPanel implements KeyListener, ActionListener {
-  private static int screenWidth = 1280;
+  private static int screenWidth = 960;
   private static int screenHeight = 720;
   private int res = Math.round(screenWidth / 3);
   public static boolean debug = false;
@@ -108,6 +108,56 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     int screenWidth = Main.screenWidth - 17;
     double[][] imageArray = player.ddaCaster();
     List<BufferedImage> textures = World.getTextures();
+    BufferedImage floor = textures.get(1);
+    int heightOfFloor = (screenHeight - 40) / 2;
+    BufferedImage image = textures.get(0);
+
+    int textureHeight = image.getHeight();
+    // int maxDistance = (int) Math.round(Math.pow(textureHeight, 1 / 0.8));
+    // double floorFactor = maxDistance / (double) heightOfFloor;
+    double xStep = (double) (screenWidth) / imageArray.length;
+
+    double xFloorFactor = ((double) floor.getWidth()) / World.getMap()[0].length;
+    double yFloorFactor = ((double) floor.getHeight()) / World.getMap().length;
+
+    double perpAngle = Math.toRadians(imageArray[(res - 1) / 2][7]);
+    for (int i = 10; i < heightOfFloor; i++) {
+      int screenPosY = heightOfFloor + i;
+      double distanceFromPlayer = (0.5 * screenHeight) / (i - heightOfFloor);
+      // System.out.println("dist:"+distanceFromPlayer+"i:"+i);
+      for (int j = 0; j < imageArray.length; j++) {
+        // int screenPosX = (j * xStep);
+        double[] positions = planeCorrection(imageArray, j);
+        // if (j == imageArray.length - 1) {
+        //   System.out.println(positions[0] + "t");
+        //   System.out.println(imageArray[(res - 1) / 2][8]);
+        // }
+        int tx =
+            (int)
+                Math.round(
+                    (positions[0] + distanceFromPlayer * Math.cos(perpAngle)) * xFloorFactor);
+        int ty =
+            (int)
+                Math.round(
+                    (positions[1] + distanceFromPlayer * Math.sin(perpAngle)) * yFloorFactor);
+        // System.out.println(ty);
+        Color floorColor;
+        floorColor = Color.WHITE;
+        try {
+          floorColor = new Color(floor.getRGB(tx, ty));
+        } catch (Exception e) {
+          // floorColor = Color.WHITE;
+          // System.out.println((int) Math.round((positions[0] + distanceFromPlayer *
+          // Math.cos(perpAngle))));
+          // System.out.println("tx:"+(positions[0] + distanceFromPlayer *
+          // Math.cos(perpAngle))+"ty:"+(positions[1] + distanceFromPlayer * Math.sin(perpAngle)));
+        }
+        g.setColor(floorColor);
+        g.drawLine(
+            (int) Math.ceil(j * xStep), screenPosY, (int) Math.ceil((j + 1) * xStep), screenPosY);
+      }
+    }
+
     for (int i = 0; i < imageArray.length; i++) {
       double originalDistance = imageArray[i][0];
       double factor = 0;
@@ -125,8 +175,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       // color = Color.BLUE;
       // }
 
-      BufferedImage image = textures.get(0);
-
       double distance = Math.cos(imageArray[i][2]) * originalDistance;
 
       double distanceFactor = Math.pow(distance, 0.8);
@@ -135,7 +183,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
 
       // Color color = Color.black;
-      int textureHeight = image.getHeight();
+
       int height = (int) Math.round(textureHeight / distanceFactor);
       int textureWidth = image.getWidth();
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
@@ -236,6 +284,32 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         screenHeight / 2 - crosairSize,
         crosairSize,
         crosairSize);
+  }
+
+  private double[] planeCorrection(double[][] imageArray, int i) {
+    double[] positions = new double[2];
+
+    int middle = (res - 1) / 2;
+    double perpAngle = Math.toRadians(imageArray[middle][7]);
+
+    double angle = perpAngle - Math.PI / 2;
+    if (i < (res - 1) / 2) {
+      angle = perpAngle + Math.PI / 2;
+    }
+
+    double posX = imageArray[i][8];
+    double posY = imageArray[i][9];
+
+    double factor = 1 / (double) (middle - 1);
+    double speed = Math.abs(i - middle) * factor;
+
+    posX += speed * Math.sin(angle);
+    posY += speed * Math.cos(angle);
+
+    positions[0] = posX;
+    positions[1] = posY;
+
+    return positions;
   }
 
   private static Color adjustColorBrightness(Color color, double factor) {
