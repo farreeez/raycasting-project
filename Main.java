@@ -12,7 +12,7 @@ import javax.swing.*;
 public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenWidth = 960;
   private static int screenHeight = 720;
-  private int res = Math.round(screenWidth / 3);
+  private int res = Math.round(screenWidth / 4);
   public static boolean debug = false;
   private Player player;
   private Timer timer;
@@ -77,7 +77,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
             }
           }
         });
-    System.out.println(Math.pow(((double) 720) / (435), 1 / 0.8));
   }
 
   public static void main(String[] args) {
@@ -106,41 +105,38 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     super.paintComponent(g);
     int screenWidth = Main.screenWidth - 17;
     double[][] imageArray = player.ddaCaster();
-    List<BufferedImage> textures = World.getTextures();
-    BufferedImage floor = textures.get(1);
+    List<BufferedImage> wallTextures = World.getWallTextures();
+    List<BufferedImage> floorCeilingTextures = World.getFloorCeilingTextures();
     int heightOfFloor = (screenHeight - 40) / 2;
-    BufferedImage image = textures.get(0);
-
+    BufferedImage image = wallTextures.get(0);
+    BufferedImage floor = floorCeilingTextures.get(0);
+    
     int textureHeight = image.getHeight();
-    int maxDistance = (int) Math.round(Math.pow(textureHeight, 1 / 0.8));
-    double floorFactor = maxDistance / (double) heightOfFloor;
-    double xStep = (double) (screenWidth) / imageArray.length;
 
-    // System.out.println(perpAngle);
     for (int i = 1; i < heightOfFloor; i++) {
-      int screenPosY = heightOfFloor + i;
+      int floorScreenPosY = heightOfFloor + i;
+      int ceilingScreenPosY = heightOfFloor - i;
 
       double steps = (screenWidth) / (double) imageArray.length;
 
       for (int j = 0; j < imageArray.length; j++) {
-
         double currentDistance = textureHeight / (Math.cos(imageArray[j][2]) * i * 2);
-
-        if (j == (screenWidth - 1) / 2) {
-          System.out.println(currentDistance);
-        }
 
         double posX = imageArray[0][8] + currentDistance * Math.cos(Math.toRadians(imageArray[j][7]));
         double posY = imageArray[0][9] - currentDistance * Math.sin(Math.toRadians(imageArray[j][7]));
 
-        Color floorColor;
-        floorColor = Color.YELLOW;
+        Color floorColor = Color.white;
         try {
-          int color = 10 * World.floorTexture[(int) Math.round(posY)][(int) Math.round(posX)];
-          // int color = 2;
-          floorColor = new Color(color, color, color);
+          if(World.floorTexture[(int) Math.floor(posY)][(int) Math.floor(posX)] == 1){
+            double ty = posY - Math.floor(posY);
+            double tx = posX - Math.floor(posX);
+            tx*=floor.getWidth();
+            ty*=floor.getHeight();
+            floorColor = new Color(floor.getRGB((int) Math.floor(tx), (int) Math.floor(ty)));
+          }
           g.setColor(floorColor);
-          g.drawLine((int) Math.ceil(j * steps), screenPosY,(int) Math.ceil((j + 1)*steps), screenPosY);
+          g.drawLine((int) Math.ceil(j * steps), floorScreenPosY,(int) Math.ceil((j + 1)*steps), floorScreenPosY);
+          g.drawLine((int) Math.ceil(j * steps), ceilingScreenPosY,(int) Math.ceil((j + 1)*steps), ceilingScreenPosY);
         } catch (Exception e) {
         }
       }
@@ -155,20 +151,9 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
       factor = Math.min(factor, 1.3);
 
-      // if (imageArray[i][1] == 2) {
-      // color = Color.GREEN;
-      // } else if (imageArray[i][1] == 3) {
-      // color = Color.RED;
-      // } else if (imageArray[i][1] == 1) {
-      // color = Color.BLUE;
-      // }
-
       double distanceFactor = Math.cos(imageArray[i][2]) * originalDistance;
 
-      // Color color = Color.black;
-
       int height = (int) Math.round(textureHeight / distanceFactor);
-      // if(i == (res-1)/2)System.out.println(height);
 
       int textureWidth = image.getWidth();
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
@@ -182,10 +167,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           xTexture = 1 - xTexture;
         }
       }
-
-      // if(xTexture == 1){
-      // xTexture = 0.99;
-      // }
 
       double textureFactorFraction = 0;
       if (height != 0) {
@@ -207,16 +188,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         }
         g.drawLine(width * i, startingHeight + j, width * (i + 1), startingHeight + j);
         if ((startingHeight + j) > screenHeight - 40) {
-          if (i == (res - 1) / 2) {
-            // System.out.println(j);
-            // System.out.println(Math.cos(rounder(imageArray[i][2])) * originalDistance);
-          }
           break;
-        }
-
-        if (j == height - 1 && i == (res - 1) / 2) {
-          // System.out.println(j);
-          // System.out.println(Math.cos(rounder(imageArray[i][2])) * originalDistance);
         }
       }
       if (debug) {
@@ -271,7 +243,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
     g.setColor(Color.blue);
 
-    int crosairSize = 24;
+    int crosairSize = 18;
     g.fillRect(
         screenWidth / 2 - crosairSize / 2,
         screenHeight / 2 - crosairSize,

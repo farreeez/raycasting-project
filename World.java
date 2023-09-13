@@ -34,29 +34,31 @@ public class World {
 
   public static int floorTexture[][] = new int[24][24];
 
-  private static List<BufferedImage> textures = new ArrayList<>();
+  private static List<BufferedImage> wallTextures = new ArrayList<>();
+  private static List<BufferedImage> floorCeilingTextures = new ArrayList<>();
   private static boolean unloaded = true;
 
-  private static void LoadTextures() {
+  private static void loadTextures() {
     // System.out.println(worldMap[0].length);
     if (unloaded) {
       try {
-        textures.add(
+        wallTextures.add(
             ImageIO.read(
                 new File(
-                    "./textures/1.png")));
-        textures.add(
+                    "./wallTextures/1.png")));
+        floorCeilingTextures.add(
             ImageIO.read(
                 new File(
-                    "./textures/3.png")));
+                    "./floorAndCeilingTextures/1.jpg")));
       } catch (Exception e) {
+        System.out.println(e);
       }
       unloaded = false;
     }
 
     for (int i = 0; i < 24; i++) {
       for (int j = 0; j < 24; j++) {
-        floorTexture[i][j] = i + 1;
+        floorTexture[i][j] = 1;
       }
     }
   }
@@ -65,8 +67,13 @@ public class World {
     return worldMap;
   }
 
-  public static List<BufferedImage> getTextures() {
-    LoadTextures();
-    return textures;
+  public static List<BufferedImage> getWallTextures() {
+    loadTextures();
+    return wallTextures;
+  }
+
+  public static List<BufferedImage> getFloorCeilingTextures() {
+    loadTextures();
+    return floorCeilingTextures;
   }
 }
