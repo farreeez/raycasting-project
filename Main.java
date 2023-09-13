@@ -110,7 +110,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     int heightOfFloor = (screenHeight - 40) / 2;
     BufferedImage image = wallTextures.get(0);
     BufferedImage floor = floorCeilingTextures.get(0);
-    
+
     int textureHeight = image.getHeight();
 
     for (int i = 1; i < heightOfFloor; i++) {
@@ -126,18 +126,21 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         double posY = imageArray[0][9] - currentDistance * Math.sin(Math.toRadians(imageArray[j][7]));
 
         Color floorColor = Color.white;
-        try {
-          if(World.floorTexture[(int) Math.floor(posY)][(int) Math.floor(posX)] == 1){
+
+        if (posY >= 0 && posY < World.floorTexture.length && posX >= 0
+            && posX < World.floorTexture[(int) posY].length) {
+          double factor = 1 / Math.pow(currentDistance, 0.2);
+          if (World.floorTexture[(int) Math.floor(posY)][(int) Math.floor(posX)] == 1) {
             double ty = posY - Math.floor(posY);
             double tx = posX - Math.floor(posX);
-            tx*=floor.getWidth();
-            ty*=floor.getHeight();
+            tx *= floor.getWidth();
+            ty *= floor.getHeight();
             floorColor = new Color(floor.getRGB((int) Math.floor(tx), (int) Math.floor(ty)));
           }
-          g.setColor(floorColor);
-          g.drawLine((int) Math.ceil(j * steps), floorScreenPosY,(int) Math.ceil((j + 1)*steps), floorScreenPosY);
-          g.drawLine((int) Math.ceil(j * steps), ceilingScreenPosY,(int) Math.ceil((j + 1)*steps), ceilingScreenPosY);
-        } catch (Exception e) {
+          g.setColor(adjustColorBrightness(floorColor, factor));
+          g.drawLine((int) Math.ceil(j * steps), floorScreenPosY, (int) Math.ceil((j + 1) * steps), floorScreenPosY);
+          g.drawLine((int) Math.ceil(j * steps), ceilingScreenPosY, (int) Math.ceil((j + 1) * steps),
+              ceilingScreenPosY);
         }
       }
     }

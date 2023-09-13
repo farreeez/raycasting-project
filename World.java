@@ -39,7 +39,6 @@ public class World {
   private static boolean unloaded = true;
 
   private static void loadTextures() {
-    // System.out.println(worldMap[0].length);
     if (unloaded) {
       try {
         wallTextures.add(

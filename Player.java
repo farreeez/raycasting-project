@@ -2,13 +2,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Player {
-  // private int worldMap[][] = {
-  // { 2, 3, 3, 3, 2 },
-  // { 3, 0, 2, 0, 3 },
-  // { 3, 0, 0, 0, 3 },
-  // { 3, 0, 0, 0, 3 },
-  // { 1, 1, 1, 1, 1 } };
-
   private double posY = 1, posX = 12; // x and y start position
   private double angle = Math.toRadians(270);
   private int res;
@@ -27,15 +20,9 @@ public class Player {
       pos++;
     }
     viewPlane[(this.res - 1) / 2][0] = angle;
-    // System.out.println((viewPlane[(this.res - 1) / 2 + 1][0] * 180) / Math.PI);
     for (int i = 0; i < (this.res - 1) / 2; i++) {
       viewPlane[i + 1 + (this.res - 1) / 2][0] = angle - inc * (i + 1);
     }
-
-    // for (int i = 0; i < viewPlane.length; i++) {
-    // System.out.println("angle " + (i + 1) + ": " + (viewPlane[i][0] * 180) /
-    // Math.PI);
-    // }
     changeDirection();
   }
 
@@ -354,27 +341,11 @@ public class Player {
 
     int currentX = (int) Math.round(this.posX);
 
-    // if (posY >= 0) {
-    //   if (y < worldMap.length
-    //       && worldMap[y][currentX] == 0
-    //       && ddaCasterHelper((res - 1) / 2, this.posX, posY)[0] > 0.2) {
-    //     this.posY = posY;
-    //   }
-    // }
-
     if (posY >= 0) {
       if (y < worldMap.length && worldMap[y][currentX] == 0) {
         this.posY = posY;
       }
     }
-
-    // if (posX >= 0) {
-    //   if (x < worldMap[(int) Math.round(this.posY)].length
-    //       && worldMap[(int) Math.round(this.posY)][x] == 0
-    //       && ddaCasterHelper((res - 1) / 2, this.posX, posY)[0] > 0.2) {
-    //     this.posX = posX;
-    //   }
-    // }
 
     if (posX >= 0
         && x < worldMap[(int) Math.round(this.posY)].length
@@ -383,12 +354,4 @@ public class Player {
     }
   }
 
-  // private double distCalc(double x1, double y1, int x2, int y2) {
-  //   double distance = 0;
-
-  //   distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-  //   System.out.println(distance);
-
-  //   return distance;
-  // }
 }
