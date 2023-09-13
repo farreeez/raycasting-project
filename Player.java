@@ -9,8 +9,8 @@ public class Player {
   // { 3, 0, 0, 0, 3 },
   // { 1, 1, 1, 1, 1 } };
 
-  private double posY = 1, posX = 1; // x and y start position
-  private double angle = Math.toRadians(90);
+  private double posY = 1, posX = 12; // x and y start position
+  private double angle = Math.toRadians(270);
   private int res;
   private double fov = 90;
   private double inc;
