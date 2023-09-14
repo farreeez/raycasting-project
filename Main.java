@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -37,6 +38,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private static boolean mouseLock = false;
   private static Cursor originalCursor;
   private static Cursor blankCursor;
+  private double[][] imageArray;
 
   public Main() {
     if (debug) {
@@ -46,6 +48,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     }
 
     player = new Player(res);
+    imageArray = player.ddaCaster();
     setFocusable(true);
     addKeyListener(this);
 
@@ -77,6 +80,34 @@ public class Main extends JPanel implements KeyListener, ActionListener {
             }
           }
         });
+    this.addMouseListener(new MouseListener() {
+
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        if (imageArray[(res - 1) / 2][1] == -1) {
+          int[][] worldMap = World.getMap();
+          worldMap[(int) imageArray[(res - 1) / 2][5]][(int) imageArray[(res - 1) / 2][6]] = 0;
+          World.setMap(worldMap);
+        }
+      }
+
+      @Override
+      public void mousePressed(MouseEvent e) {
+      }
+
+      @Override
+      public void mouseReleased(MouseEvent e) {
+      }
+
+      @Override
+      public void mouseEntered(MouseEvent e) {
+      }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+      }
+
+    });
   }
 
   public static void main(String[] args) {
@@ -104,7 +135,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     int screenWidth = Main.screenWidth - 17;
-    double[][] imageArray = player.ddaCaster();
     List<BufferedImage> wallTextures = World.getWallTextures();
     List<BufferedImage> floorCeilingTextures = World.getFloorCeilingTextures();
     int heightOfFloor = (screenHeight - 40) / 2;
@@ -138,8 +168,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
             floorColor = new Color(floor.getRGB((int) Math.floor(tx), (int) Math.floor(ty)));
           }
           g.setColor(adjustColorBrightness(floorColor, factor));
-          g.drawLine((int) Math.ceil(j * steps), floorScreenPosY, (int) Math.ceil((j + 1) * steps), floorScreenPosY);
-          g.drawLine((int) Math.ceil(j * steps), ceilingScreenPosY, (int) Math.ceil((j + 1) * steps),
+          g.drawLine((int) Math.floor(j * steps), floorScreenPosY, (int) Math.floor((j + 1) * steps), floorScreenPosY);
+          g.drawLine((int) Math.floor(j * steps), ceilingScreenPosY, (int) Math.floor((j + 1) * steps),
               ceilingScreenPosY);
         }
       }
@@ -157,6 +187,12 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       double distanceFactor = Math.cos(imageArray[i][2]) * originalDistance;
 
       int height = (int) Math.round(textureHeight / distanceFactor);
+
+      if (imageArray[i][1] == -1) {
+        image = wallTextures.get(1);
+      } else {
+        image = wallTextures.get(0);
+      }
 
       int textureWidth = image.getWidth();
       int width = (int) Math.round((double) screenWidth / (imageArray.length));
@@ -181,15 +217,18 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         start = startingHeight * -1;
       }
       for (int j = start; j < height; j++) {
-        Color color = new Color(
-            image.getRGB(
-                (int) Math.floor(xTexture * textureWidth), (int) (j * textureFactorFraction)));
-        if (imageArray[i][1] != 0) {
-          g.setColor(adjustColorBrightness(color, factor));
-        } else {
-          g.setColor(color);
+        try {
+          Color color = new Color(
+              image.getRGB(
+                  (int) Math.floor(xTexture * textureWidth), (int) (j * textureFactorFraction)));
+          if (imageArray[i][1] != 0) {
+            g.setColor(adjustColorBrightness(color, factor));
+          } else {
+            g.setColor(color);
+          }
+          g.drawLine(width * i, startingHeight + j, width * (i + 1), startingHeight + j);
+        } catch (Exception e) {
         }
-        g.drawLine(width * i, startingHeight + j, width * (i + 1), startingHeight + j);
         if ((startingHeight + j) > screenHeight - 40) {
           break;
         }
@@ -243,13 +282,12 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     int playerPeekY = playerPosY + (int) (radius / 2 * Math.cos(angle)) + radius / 4;
     g.setColor(Color.BLUE);
     g.fillOval(playerPeekX, playerPeekY, radius / 2, radius / 2);
-
     g.setColor(Color.blue);
 
     int crosairSize = 18;
     g.fillRect(
         screenWidth / 2 - crosairSize / 2,
-        screenHeight / 2 - crosairSize,
+        (screenHeight - 40) / 2 - crosairSize / 2,
         crosairSize,
         crosairSize);
   }
@@ -355,6 +393,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
   @Override
   public void actionPerformed(ActionEvent e) {
+    imageArray = player.ddaCaster();
     repaint();
   }
 }
