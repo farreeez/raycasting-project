@@ -1,6 +1,7 @@
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.imageio.ImageIO;
 
@@ -37,6 +38,7 @@ public class World {
   private static List<BufferedImage> wallTextures = new ArrayList<>();
   private static List<BufferedImage> floorCeilingTextures = new ArrayList<>();
   private static boolean unloaded = true;
+  private static List<Sprite> sprites = new ArrayList<>();
 
   private static void loadTextures() {
     if (unloaded) {
@@ -53,6 +55,11 @@ public class World {
             ImageIO.read(
                 new File(
                     "./floorAndCeilingTextures/1.jpg")));
+        BufferedImage gameMasterImg = ImageIO.read(
+            new File(
+                "./sprites/stickman.png"));
+        Sprite gameMaster = new Sprite(2.5, 6, gameMasterImg);
+        sprites.add(gameMaster);
       } catch (Exception e) {
         System.out.println(e);
       }
@@ -64,6 +71,10 @@ public class World {
         floorTexture[i][j] = 1;
       }
     }
+  }
+
+  public static List<Sprite> getsprites() {
+    return sprites;
   }
 
   public static int[][] getMap() {

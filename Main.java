@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 
@@ -81,18 +82,29 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           }
         });
     this.addMouseListener(new MouseListener() {
-
       @Override
       public void mouseClicked(MouseEvent e) {
-        if (imageArray[(res - 1) / 2][1] == -1) {
-          int[][] worldMap = World.getMap();
-          worldMap[(int) imageArray[(res - 1) / 2][5]][(int) imageArray[(res - 1) / 2][6]] = 0;
-          World.setMap(worldMap);
-        }
       }
 
       @Override
       public void mousePressed(MouseEvent e) {
+        int pressCode = e.getButton();
+        if (pressCode == MouseEvent.BUTTON1) {
+          boolean open = false;
+          int pos = 0;
+          for (int i = (res - 1) / 2 - 6; i < (res - 1) / 2 + 6; i++) {
+            if (imageArray[i][1] == -1) {
+              open = true;
+              pos = i;
+              break;
+            }
+          }
+          if (open) {
+            int[][] worldMap = World.getMap();
+            worldMap[(int) imageArray[pos][5]][(int) imageArray[pos][6]] = 0;
+            World.setMap(worldMap);
+          }
+        }
       }
 
       @Override
@@ -106,7 +118,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       @Override
       public void mouseExited(MouseEvent e) {
       }
-
     });
   }
 
@@ -143,6 +154,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
     int textureHeight = image.getHeight();
 
+    // drawing floor and ceiling
     for (int i = 1; i < heightOfFloor; i++) {
       int floorScreenPosY = heightOfFloor + i;
       int ceilingScreenPosY = heightOfFloor - i;
@@ -150,7 +162,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       double steps = (screenWidth) / (double) imageArray.length;
 
       for (int j = 0; j < imageArray.length; j++) {
-        double currentDistance = textureHeight / (Math.cos(imageArray[j][2]) * i * 2);
+        double currentDistance = textureHeight / (Math.cos(imageArray[j][2]) * i * 2 * 0.8);
 
         double posX = imageArray[0][8] + currentDistance * Math.cos(Math.toRadians(imageArray[j][7]));
         double posY = imageArray[0][9] - currentDistance * Math.sin(Math.toRadians(imageArray[j][7]));
@@ -175,6 +187,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
     }
 
+    // drawing walls
     for (int i = 0; i < imageArray.length; i++) {
       double originalDistance = imageArray[i][0];
       double factor = 0;
@@ -185,6 +198,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       factor = Math.min(factor, 1.3);
 
       double distanceFactor = Math.cos(imageArray[i][2]) * originalDistance;
+      distanceFactor *= 0.8;
 
       int height = (int) Math.round(textureHeight / distanceFactor);
 
@@ -270,6 +284,50 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
     }
 
+    // drawing sprites
+    List<Sprite> sprites = World.getsprites();
+    double currentPosX = imageArray[0][8];
+    double currentPosY = imageArray[0][9];
+    double playerAngle = Math.toRadians(imageArray[(res - 1) / 2][7]);
+    for (int i = 0; i < sprites.size(); i++) {
+      Sprite currentSprite = sprites.get(i);
+      double[] spritePos = currentSprite.getpos();
+      double spriteDirY = -(spritePos[1] - currentPosY);
+      double spriteDirX = (spritePos[0] - currentPosX);
+      double spriteAngle = findAngle(spriteDirY, spriteDirX);
+
+      double angleDiff = fixAngle(playerAngle - spriteAngle);
+
+      // System.out.println(Math.toDegrees(playerAngle));
+      // System.out.println(Math.toDegrees(spriteAngle));
+      // System.out.println("ss");
+      double distanceFromPlayer = distBetweenPoints(currentPosX, currentPosY, spritePos[0], spritePos[1]);
+      if ((angleDiff <= Math.toRadians(45)) && (distanceFromPlayer >= 0.5)) {
+        BufferedImage img = currentSprite.getTexture();
+        double spriteHeight = (textureHeight / (distanceFromPlayer * 0.8));
+        double spriteProportion = ((double) img.getWidth()) / img.getHeight();
+        double spriteWidth = (spriteProportion * spriteHeight);
+        double widthFactor = img.getWidth() / spriteWidth;
+        double heightFactor = img.getHeight() / spriteHeight;
+        if (isBiggerThan(spriteAngle, playerAngle)) {
+          angleDiff += Math.PI / 4;
+        }
+        double middlePos = angleDiff * screenWidth / (Math.PI / 2);
+        for (int j = 0; j < spriteWidth; j++) {
+          for (int k = 0; k < spriteHeight; k++) {
+            int tx = (int) Math.floor(j * widthFactor);
+            int ty = (int) Math.floor(k * heightFactor);
+            int rgb = img.getRGB(tx, ty);
+            int screenY = (int) (((screenHeight - spriteHeight)/2) + k);
+            if ((rgb >> 24 & 0xFF) != 0) {
+              g.setColor(new Color(rgb));
+              g.drawLine((int) (middlePos + j - spriteWidth), screenY, (int) (middlePos + j - spriteWidth), screenY);
+            }
+          }
+        }
+      }
+    }
+
     double[] position = player.getPosition();
     g.setColor(Color.WHITE);
     int radius = 16;
@@ -284,12 +342,42 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     g.fillOval(playerPeekX, playerPeekY, radius / 2, radius / 2);
     g.setColor(Color.blue);
 
-    int crosairSize = 18;
+    int crosairSize = 16;
     g.fillRect(
         screenWidth / 2 - crosairSize / 2,
         (screenHeight - 40) / 2 - crosairSize / 2,
         crosairSize,
         crosairSize);
+  }
+
+  private double findAngle(double spriteDirY, double spriteDirX) {
+    double angle = Math.atan(spriteDirY / spriteDirX);
+    if (spriteDirX < 0 && spriteDirY > 0) {
+      angle = Math.PI - angle;
+    } else if (spriteDirX < 0 && spriteDirY < 0) {
+      angle += Math.PI;
+    } else if (spriteDirX > 0 && spriteDirY < 0) {
+      angle = 2 * Math.PI - angle;
+    }
+    return angle;
+  }
+
+  private boolean isBiggerThan(double spriteAngle, double currentAngle) {
+    boolean bigger = false;
+    spriteAngle = spriteAngle % (Math.PI * 2);
+    currentAngle = currentAngle % (Math.PI * 2);
+    int multiple90Sprite = (int) (spriteAngle / (Math.PI * 0.5));
+    int multiple90Current = (int) (currentAngle / (Math.PI * 0.5));
+    if (multiple90Sprite == multiple90Current && spriteAngle < currentAngle) {
+      bigger = true;
+    } else {
+      if (multiple90Current > 0 && multiple90Sprite < multiple90Current) {
+        bigger = true;
+      } else if (multiple90Sprite == 3) {
+        bigger = true;
+      }
+    }
+    return bigger;
   }
 
   private static Color adjustColorBrightness(Color color, double factor) {
@@ -361,6 +449,22 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
       mouseLock = !mouseLock;
     }
+  }
+
+  private double fixAngle(double angle) {
+    if (angle < 0) {
+      angle += Math.PI * 2;
+    }
+
+    if (angle > Math.PI) {
+      angle = Math.PI * 2 - angle;
+    }
+
+    return angle;
+  }
+
+  private double distBetweenPoints(double x1, double y1, double x2, double y2) {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
   }
 
   @Override
