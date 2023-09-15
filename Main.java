@@ -301,6 +301,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       double spriteDirX = (spritePos[1] - currentPosX);
       double spriteAngle = findAngle(spriteDirY, spriteDirX, playerAngle);
 
+      // System.out.println(spriteAngle);
+      // System.out.println(playerAngle);
+      // System.out.println("ss");
+
       double angleDiff = fixAngle(Math.PI / 2 - spriteAngle);
 
       double distanceFromPlayer = distBetweenPoints(currentPosX, currentPosY, spritePos[1], spritePos[0]);
@@ -357,13 +361,13 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         crosairSize);
   }
 
-  private boolean isBehind(int index, double distance){
-    if(index - 4 < 0 || index + 4 >= wallDist.length){
+  private boolean isBehind(int index, double distance) {
+    if (index - 4 < 0 || index + 4 >= wallDist.length) {
       return false;
     }
 
-    for(int i = index - 4; i < index + 4; i++){
-      if(wallDist[i] < distance){
+    for (int i = index - 4; i < index + 4; i++) {
+      if (wallDist[i] < distance) {
         return false;
       }
     }
@@ -388,6 +392,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     double fakeSpriteDirX = Math.abs(spriteDirX);
     double fakeSpriteDirY = Math.abs(spriteDirY);
     double angle = Math.atan(fakeSpriteDirY / fakeSpriteDirX);
+
     if (spriteDirX < 0 && spriteDirY > 0) {
       angle = Math.PI - angle;
     } else if (spriteDirX < 0 && spriteDirY < 0) {
@@ -395,9 +400,13 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     } else if (spriteDirX > 0 && spriteDirY < 0) {
       angle = 2 * Math.PI - angle;
     }
-
     // angle %= Math.PI*2;
     angle += (Math.PI / 2 - currentAngle);
+
+    if(angle < 0){
+      angle += Math.PI * 2;
+    }
+    
     return angle;
   }
 
