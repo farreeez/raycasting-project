@@ -57,7 +57,7 @@ public class World {
         BufferedImage gameMasterImg = ImageIO.read(
             new File(
                 "./sprites/stickman.png"));
-        Sprite gameMaster = new Sprite(2.5, 6, gameMasterImg);
+        Sprite gameMaster = new Sprite(8.5, 6.5, gameMasterImg);
         sprites.add(gameMaster);
       } catch (Exception e) {
         System.out.println(e);

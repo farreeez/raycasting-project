@@ -39,6 +39,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private static Cursor originalCursor;
   private static Cursor blankCursor;
   private double[][] imageArray;
+  private double[] wallDist;
 
   public Main() {
     if (debug) {
@@ -49,6 +50,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
     player = new Player(res);
     imageArray = player.ddaCaster();
+    wallDist = new double[imageArray.length];
     setFocusable(true);
     addKeyListener(this);
 
@@ -197,6 +199,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       factor = Math.min(factor, 1.3);
 
       double distanceFactor = Math.cos(imageArray[i][2]) * originalDistance;
+      wallDist[i] = distanceFactor;
+
       distanceFactor *= 0.8;
 
       int height = (int) Math.round(textureHeight / distanceFactor);
@@ -285,6 +289,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
     // drawing sprites
     List<Sprite> sprites = World.getsprites();
+    arrangeSprites(sprites, player.getPosition());
     double currentPosX = imageArray[0][8];
     double currentPosY = imageArray[0][9];
     double playerAngle = Math.toRadians(imageArray[(res - 1) / 2][7]);
@@ -292,17 +297,13 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       Sprite currentSprite = sprites.get(i);
       double[] spritePos = currentSprite.getpos();
 
-      double spriteDirY = -(spritePos[1] - currentPosY);
-      double spriteDirX = (spritePos[0] - currentPosX);
+      double spriteDirY = -(spritePos[0] - currentPosY);
+      double spriteDirX = (spritePos[1] - currentPosX);
       double spriteAngle = findAngle(spriteDirY, spriteDirX, playerAngle);
 
-      double angleDiff = fixAngle(Math.PI/2 - spriteAngle);
+      double angleDiff = fixAngle(Math.PI / 2 - spriteAngle);
 
-      // System.out.println("player PosX: " + currentPosX + "player posY: " + currentPosY);
-      // System.out.println(Math.toDegrees(playerAngle));
-      // System.out.println(Math.toDegrees(spriteAngle));
-      // System.out.println("ss");
-      double distanceFromPlayer = distBetweenPoints(currentPosX, currentPosY, spritePos[0], spritePos[1]);
+      double distanceFromPlayer = distBetweenPoints(currentPosX, currentPosY, spritePos[1], spritePos[0]);
       if ((angleDiff <= Math.toRadians(45)) && (distanceFromPlayer >= 0.5)) {
         BufferedImage img = currentSprite.getTexture();
         double spriteHeight = (textureHeight / (distanceFromPlayer));
@@ -310,21 +311,25 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         double spriteWidth = (spriteProportion * spriteHeight);
         double widthFactor = img.getWidth() / spriteWidth;
         double heightFactor = img.getHeight() / spriteHeight;
-        if (isBiggerThan(spriteAngle, Math.PI/2)) {
+        if (isBiggerThan(spriteAngle, Math.PI / 2)) {
           angleDiff += Math.PI / 4;
         } else {
-          angleDiff = Math.PI/4 - angleDiff;
+          angleDiff = Math.PI / 4 - angleDiff;
         }
         double middlePos = angleDiff * screenWidth / (Math.PI / 2);
         for (int j = 0; j < spriteWidth; j++) {
-          for (int k = 0; k < spriteHeight; k++) {
-            int tx = (int) Math.floor(j * widthFactor);
-            int ty = (int) Math.floor(k * heightFactor);
-            int rgb = img.getRGB(tx, ty);
-            int screenY = (int) Math.round(((screenHeight - spriteHeight - 20)/2) + k);
-            if ((rgb >> 24 & 0xFF) != 0) {
-              g.setColor(new Color(rgb));
-              g.drawLine((int) (middlePos + j - spriteWidth), screenY, (int) (middlePos + j - spriteWidth), screenY);
+          int screenX = (int) (middlePos + j - spriteWidth / 2);
+          int currentRay = (int) Math.floor((((double) screenX) / screenWidth) * imageArray.length);
+          if (isBehind(currentRay, distanceFromPlayer)) {
+            for (int k = 0; k < spriteHeight; k++) {
+              int tx = (int) Math.floor(j * widthFactor);
+              int ty = (int) Math.floor(k * heightFactor);
+              int rgb = img.getRGB(tx, ty);
+              int screenY = (int) Math.round(((screenHeight - spriteHeight - 30) / 2) + k);
+              if ((rgb >> 24 & 0xFF) != 0) {
+                g.setColor(new Color(rgb));
+                g.drawLine(screenX, screenY, screenX, screenY);
+              }
             }
           }
         }
@@ -338,7 +343,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     int playerPosY = (int) Math.round(smallHeight * position[0]);
     g.fillOval(playerPosX, playerPosY, radius, radius);
     double angle = player.getAngle() + Math.PI / 2;
-    // angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
     int playerPeekX = playerPosX + (int) (radius / 2 * Math.sin(angle)) + radius / 4;
     int playerPeekY = playerPosY + (int) (radius / 2 * Math.cos(angle)) + radius / 4;
     g.setColor(Color.BLUE);
@@ -351,6 +355,33 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         (screenHeight - 40) / 2 - crosairSize / 2,
         crosairSize,
         crosairSize);
+  }
+
+  private boolean isBehind(int index, double distance){
+    if(index - 4 < 0 || index + 4 >= wallDist.length){
+      return false;
+    }
+
+    for(int i = index - 4; i < index + 4; i++){
+      if(wallDist[i] < distance){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // consider changing to nlogn
+  private void arrangeSprites(List<Sprite> sprites, double[] position) {
+    for (int i = 0; i < sprites.size(); i++) {
+      int current = i;
+      while (current > 0 && sprites.get(current).getDist(position) < sprites.get(current - 1).getDist(position)) {
+        Sprite saved = sprites.get(current);
+        sprites.set(current, sprites.get(current - 1));
+        sprites.set(current - 1, saved);
+        current--;
+      }
+    }
   }
 
   private double findAngle(double spriteDirY, double spriteDirX, double currentAngle) {
@@ -366,7 +397,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     }
 
     // angle %= Math.PI*2;
-    angle += (Math.PI/2 - currentAngle);
+    angle += (Math.PI / 2 - currentAngle);
     return angle;
   }
 
@@ -471,7 +502,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     return angle;
   }
 
-  private double distBetweenPoints(double x1, double y1, double x2, double y2) {
+  public static double distBetweenPoints(double x1, double y1, double x2, double y2) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
   }
 

@@ -12,7 +12,7 @@ public class Sprite {
     }
 
     public double[] getpos() {
-        double [] pos = {posX,posY};
+        double [] pos = {posY,posX};
         return pos;
     }
 
@@ -22,6 +22,13 @@ public class Sprite {
 
     public void setPosY(double y){
         posY = y;
+    }
+
+    public double getDist(double[] playerPosition){
+        double pX = playerPosition[1];
+        double pY = playerPosition[0];
+
+        return Main.distBetweenPoints(posX, posY, pX, pY);
     }
 
     public BufferedImage getTexture(){
