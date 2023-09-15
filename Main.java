@@ -212,7 +212,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
 
       int textureWidth = image.getWidth();
-      int width = (int) Math.round((double) screenWidth / (imageArray.length));
+      double width = ((double) screenWidth) / imageArray.length;
       double xTexture = imageArray[i][4];
       if (imageArray[i][3] == 1) {
         if (imageArray[i][7] > 180) {
@@ -243,7 +243,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           } else {
             g.setColor(color);
           }
-          g.drawLine(width * i, startingHeight + j, width * (i + 1), startingHeight + j);
+          g.drawLine((int) Math.round(width * i), startingHeight + j, (int) Math.round(width * (i + 1)),
+              startingHeight + j);
         } catch (Exception e) {
         }
         if ((startingHeight + j) > screenHeight - 40) {
@@ -253,13 +254,15 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       if (debug) {
         g.setColor(Color.WHITE);
         g.setFont(g.getFont().deriveFont(24, 17.0f));
-        g.drawString("y: " + rounder(imageArray[i][5]), width * (i), 100);
-        g.drawString("x: " + rounder(imageArray[i][6]), width * (i), 200);
-        // g.drawString("ang: " + rounder(imageArray[i][7]), width * (i), 300);
-        g.drawString("x: " + rounder(imageArray[i][8]), width * (i), 400);
-        g.drawString("y: " + rounder(imageArray[i][9]), width * (i), 500);
-        // g.drawString("colour: " + rounder(imageArray[i][10]), width * (i), 600);
-        g.drawString("d: " + rounder(imageArray[i][0]), width * i, 600);
+        g.drawString("y: " + rounder(imageArray[i][5]), (int) Math.round(width * i), 100);
+        g.drawString("x: " + rounder(imageArray[i][6]), (int) Math.round(width * i), 200);
+        // g.drawString("ang: " + rounder(imageArray[i][7]), (int) Math.round(width *
+        // i), 300);
+        g.drawString("x: " + rounder(imageArray[i][8]), (int) Math.round(width * i), 400);
+        g.drawString("y: " + rounder(imageArray[i][9]), (int) Math.round(width * i), 500);
+        // g.drawString("colour: " + rounder(imageArray[i][10]), (int) Math.round(width
+        // * i), 600);
+        g.drawString("d: " + rounder(imageArray[i][0]), (int) Math.round(width * i), 600);
       }
     }
 
@@ -313,7 +316,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         double spriteHeight = (textureHeight / (distanceFromPlayer));
         double spriteProportion = ((double) img.getWidth()) / img.getHeight();
         double spriteWidth = (spriteProportion * spriteHeight);
-        double widthFactor = img.getWidth() / spriteWidth;
+        double adjustedSpriteWidth = spriteWidth / 4;
+        double widthFactor = img.getWidth() / adjustedSpriteWidth;
         double heightFactor = img.getHeight() / spriteHeight;
         if (isBiggerThan(spriteAngle, Math.PI / 2)) {
           angleDiff += Math.PI / 4;
@@ -321,8 +325,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           angleDiff = Math.PI / 4 - angleDiff;
         }
         double middlePos = angleDiff * screenWidth / (Math.PI / 2);
-        for (int j = 0; j < spriteWidth; j++) {
-          int screenX = (int) (middlePos + j - spriteWidth / 2);
+        for (int j = 0; j < adjustedSpriteWidth; j++) {
+          int screenX = (int) (middlePos + j * 4 - spriteWidth / 2);
           int currentRay = (int) Math.floor((((double) screenX) / screenWidth) * imageArray.length);
           if (isBehind(currentRay, distanceFromPlayer)) {
             for (int k = 0; k < spriteHeight; k++) {
@@ -332,7 +336,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
               int screenY = (int) Math.round(((screenHeight - spriteHeight - 30) / 2) + k);
               if ((rgb >> 24 & 0xFF) != 0) {
                 g.setColor(new Color(rgb));
-                g.drawLine(screenX, screenY, screenX, screenY);
+                g.drawLine(screenX, screenY, screenX + 4, screenY);
               }
             }
           }
@@ -362,14 +366,12 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   }
 
   private boolean isBehind(int index, double distance) {
-    if (index - 4 < 0 || index + 4 >= wallDist.length) {
+    if (index < 0 || index >= wallDist.length) {
       return false;
     }
 
-    for (int i = index - 4; i < index + 4; i++) {
-      if (wallDist[i] < distance) {
-        return false;
-      }
+    if (wallDist[index] < distance) {
+      return false;
     }
 
     return true;
@@ -403,10 +405,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     // angle %= Math.PI*2;
     angle += (Math.PI / 2 - currentAngle);
 
-    if(angle < 0){
+    if (angle < 0) {
       angle += Math.PI * 2;
     }
-    
+
     return angle;
   }
 
