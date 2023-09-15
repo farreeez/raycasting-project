@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 
@@ -292,25 +291,29 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     for (int i = 0; i < sprites.size(); i++) {
       Sprite currentSprite = sprites.get(i);
       double[] spritePos = currentSprite.getpos();
+
       double spriteDirY = -(spritePos[1] - currentPosY);
       double spriteDirX = (spritePos[0] - currentPosX);
-      double spriteAngle = findAngle(spriteDirY, spriteDirX);
+      double spriteAngle = findAngle(spriteDirY, spriteDirX, playerAngle);
 
-      double angleDiff = fixAngle(playerAngle - spriteAngle);
+      double angleDiff = fixAngle(Math.PI/2 - spriteAngle);
 
+      // System.out.println("player PosX: " + currentPosX + "player posY: " + currentPosY);
       // System.out.println(Math.toDegrees(playerAngle));
       // System.out.println(Math.toDegrees(spriteAngle));
       // System.out.println("ss");
       double distanceFromPlayer = distBetweenPoints(currentPosX, currentPosY, spritePos[0], spritePos[1]);
       if ((angleDiff <= Math.toRadians(45)) && (distanceFromPlayer >= 0.5)) {
         BufferedImage img = currentSprite.getTexture();
-        double spriteHeight = (textureHeight / (distanceFromPlayer * 0.8));
+        double spriteHeight = (textureHeight / (distanceFromPlayer));
         double spriteProportion = ((double) img.getWidth()) / img.getHeight();
         double spriteWidth = (spriteProportion * spriteHeight);
         double widthFactor = img.getWidth() / spriteWidth;
         double heightFactor = img.getHeight() / spriteHeight;
-        if (isBiggerThan(spriteAngle, playerAngle)) {
+        if (isBiggerThan(spriteAngle, Math.PI/2)) {
           angleDiff += Math.PI / 4;
+        } else {
+          angleDiff = Math.PI/4 - angleDiff;
         }
         double middlePos = angleDiff * screenWidth / (Math.PI / 2);
         for (int j = 0; j < spriteWidth; j++) {
@@ -318,7 +321,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
             int tx = (int) Math.floor(j * widthFactor);
             int ty = (int) Math.floor(k * heightFactor);
             int rgb = img.getRGB(tx, ty);
-            int screenY = (int) (((screenHeight - spriteHeight)/2) + k);
+            int screenY = (int) Math.round(((screenHeight - spriteHeight - 20)/2) + k);
             if ((rgb >> 24 & 0xFF) != 0) {
               g.setColor(new Color(rgb));
               g.drawLine((int) (middlePos + j - spriteWidth), screenY, (int) (middlePos + j - spriteWidth), screenY);
@@ -350,8 +353,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         crosairSize);
   }
 
-  private double findAngle(double spriteDirY, double spriteDirX) {
-    double angle = Math.atan(spriteDirY / spriteDirX);
+  private double findAngle(double spriteDirY, double spriteDirX, double currentAngle) {
+    double fakeSpriteDirX = Math.abs(spriteDirX);
+    double fakeSpriteDirY = Math.abs(spriteDirY);
+    double angle = Math.atan(fakeSpriteDirY / fakeSpriteDirX);
     if (spriteDirX < 0 && spriteDirY > 0) {
       angle = Math.PI - angle;
     } else if (spriteDirX < 0 && spriteDirY < 0) {
@@ -359,6 +364,9 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     } else if (spriteDirX > 0 && spriteDirY < 0) {
       angle = 2 * Math.PI - angle;
     }
+
+    // angle %= Math.PI*2;
+    angle += (Math.PI/2 - currentAngle);
     return angle;
   }
 
