@@ -70,14 +70,15 @@ public class World {
       unloaded = false;
     }
 
-    for (int i = 0; i < 25; i++) {
-      for (int j = 0; j < 24; j++) {
+    for (int i = 0; i < worldMap.length; i++) {
+      for (int j = 0; j < worldMap[0].length; j++) {
         floorTexture[i][j] = 1;
       }
     }
   }
 
   public static List<Sprite> getsprites() {
+    loadTextures();
     return sprites;
   }
 

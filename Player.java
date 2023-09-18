@@ -25,9 +25,7 @@ public class Player {
     changeDirection();
   }
 
-  public int[][] getMap() {
-    return World.getMap();
-  }
+  
 
   public double[] getPosition() {
     double[] position = { posY, posX };
@@ -37,8 +35,6 @@ public class Player {
   public double getAngle() {
     return viewPlane[(res - 1) / 2][0];
   }
-
-  int fakeCount = 0;
 
   private double[] ddaCasterHelper(int i, double orgPosX, double orgPosY) {
     double[] imageArray = new double[11];
@@ -56,7 +52,7 @@ public class Player {
     int xCount = 0;
     int y = 0;
     int x = 0;
-    int[][] worldMap = getMap();
+    int[][] worldMap = World.getMap();
     // viewPlane[i][1] is dirY
     // viewPlane[i][2] is dirX
     while (noBoundary && count < 2000) {
@@ -161,7 +157,7 @@ public class Player {
   }
 
   public double[][] ddaCaster() {
-    double[][] imageArray = new double[res][5];
+    double[][] imageArray = new double[res][10];
     if (Main.debug) {
       imageArray = new double[res][11];
     }
@@ -306,7 +302,7 @@ public class Player {
   }
 
   private void move(double angle) {
-    int[][] worldMap = getMap();
+    int[][] worldMap = World.getMap();
     double speed = 0.02;
     angle = angle - Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
     double posX = this.posX;

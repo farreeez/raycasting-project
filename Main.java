@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
@@ -40,6 +41,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private static Cursor blankCursor;
   private double[][] imageArray;
   private double[] wallDist;
+  private List<Sprite> sprites;
+  private double[][] spriteAngles;
 
   public Main() {
     if (debug) {
@@ -53,6 +56,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     wallDist = new double[imageArray.length];
     setFocusable(true);
     addKeyListener(this);
+
+    sprites = World.getsprites();
+    arrangeSprites(sprites, player.getPosition());
+    spriteAngles = new double[sprites.size()][3];
 
     try {
       this.robot = new Robot();
@@ -104,6 +111,20 @@ public class Main extends JPanel implements KeyListener, ActionListener {
             int[][] worldMap = World.getMap();
             worldMap[(int) imageArray[pos][5]][(int) imageArray[pos][6]] = 0;
             World.setMap(worldMap);
+          } else {
+            boolean spriteInWay = false;
+            int ray = 0;
+            for(int i = 0; i < spriteAngles.length; i++){
+              if((res-1)/2 >= spriteAngles[i][0] && (res-1)/2 <= spriteAngles[i][1]){
+                spriteInWay = true;
+                ray = i;
+                break;
+              }
+            }
+
+            if(spriteInWay && isBehind((res-1)/2, spriteAngles[ray][2])){
+              // code for clicking on player or object
+            }
           }
         }
       }
@@ -266,7 +287,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
     }
 
-    int[][] worldMap = player.getMap();
+    int[][] worldMap = World.getMap();
     int width = (int) Math.floor((double) screenWidth / 6);
     int height = (worldMap.length / worldMap[0].length) * width;
     int smallWidth = (int) Math.floor((double) width / worldMap[0].length);
@@ -275,14 +296,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     for (int i = 0; i < worldMap.length; i++) {
       for (int j = 0; j < worldMap[i].length; j++) {
         Color color = Color.BLACK;
-        if (worldMap[i][j] == 2) {
-          color = Color.GREEN;
-        } else if (worldMap[i][j] == 3) {
-          color = Color.RED;
-        } else if (worldMap[i][j] == 1) {
-          color = Color.BLUE;
-        } else if (worldMap[i][j] != 0) {
+        if (worldMap[i][j] > 0) {
           color = Color.GRAY;
+        } else if (worldMap[i][j] == -1) {
+          color = Color.YELLOW;
         }
         g.setColor(color);
         g.fillRect(
@@ -291,8 +308,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     }
 
     // drawing sprites
-    List<Sprite> sprites = World.getsprites();
-    arrangeSprites(sprites, player.getPosition());
+
     double currentPosX = imageArray[0][8];
     double currentPosY = imageArray[0][9];
     double playerAngle = Math.toRadians(imageArray[(res - 1) / 2][7]);
@@ -303,10 +319,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       double spriteDirY = -(spritePos[0] - currentPosY);
       double spriteDirX = (spritePos[1] - currentPosX);
       double spriteAngle = findAngle(spriteDirY, spriteDirX, playerAngle);
-
-      // System.out.println(spriteAngle);
-      // System.out.println(playerAngle);
-      // System.out.println("ss");
 
       double angleDiff = fixAngle(Math.PI / 2 - spriteAngle);
 
@@ -325,6 +337,25 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           angleDiff = Math.PI / 4 - angleDiff;
         }
         double middlePos = angleDiff * screenWidth / (Math.PI / 2);
+
+        double spritePixel = middlePos + 0 * 4 - spriteWidth / 2;
+        spritePixel = (int) Math
+            .floor((((double) spritePixel) / screenWidth) * imageArray.length);
+        double rightAngle = 0;
+        double leftAngle = 0;
+
+        if (spritePixel >= 0 && spritePixel <= screenWidth) {
+          leftAngle = (int) spritePixel;
+        }
+        spritePixel = middlePos + adjustedSpriteWidth * 4 - spriteWidth / 2;
+        spritePixel = (int) Math
+            .floor((((double) spritePixel) / screenWidth) * imageArray.length);
+        if (spritePixel >= 0 && spritePixel <= imageArray.length) {
+          rightAngle = (int) spritePixel;
+        }
+        double[] arr = { leftAngle, rightAngle, distanceFromPlayer };
+        spriteAngles[i] = arr;
+
         for (int j = 0; j < adjustedSpriteWidth; j++) {
           int screenX = (int) (middlePos + j * 4 - spriteWidth / 2);
           int currentRay = (int) Math.floor((((double) screenX) / screenWidth) * imageArray.length);
