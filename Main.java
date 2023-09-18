@@ -114,15 +114,15 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           } else {
             boolean spriteInWay = false;
             int ray = 0;
-            for(int i = 0; i < spriteAngles.length; i++){
-              if((res-1)/2 >= spriteAngles[i][0] && (res-1)/2 <= spriteAngles[i][1]){
+            for (int i = 0; i < spriteAngles.length; i++) {
+              if ((res - 1) / 2 >= spriteAngles[i][0] && (res - 1) / 2 <= spriteAngles[i][1]) {
                 spriteInWay = true;
                 ray = i;
                 break;
               }
             }
 
-            if(spriteInWay && isBehind((res-1)/2, spriteAngles[ray][2])){
+            if (spriteInWay && isBehind((res - 1) / 2, spriteAngles[ray][2]) && spriteAngles[ray][2] >= 0.5) {
               // code for clicking on player or object
             }
           }
@@ -323,6 +323,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       double angleDiff = fixAngle(Math.PI / 2 - spriteAngle);
 
       double distanceFromPlayer = distBetweenPoints(currentPosX, currentPosY, spritePos[1], spritePos[0]);
+
+      spriteAngles[i][2] = distanceFromPlayer;
       if ((angleDiff <= Math.toRadians(45)) && (distanceFromPlayer >= 0.5)) {
         BufferedImage img = currentSprite.getTexture();
         double spriteHeight = (textureHeight / (distanceFromPlayer));
