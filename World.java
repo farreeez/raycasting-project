@@ -38,6 +38,7 @@ public class World {
   private static List<BufferedImage> floorCeilingTextures = new ArrayList<>();
   private static boolean unloaded = true;
   private static List<Sprite> sprites = new ArrayList<>();
+  private static Gun gun;
 
   private static void loadTextures() {
     if (unloaded) {
@@ -48,8 +49,11 @@ public class World {
         BufferedImage gameMasterImg = ImageIO.read(new File("./sprites/stickman.png"));
         BufferedImage deadGameMasterImg = ImageIO.read(new File("./sprites/deadstickman.png"));
         BufferedImage man = ImageIO.read(new File("./sprites/stickman.png"));
-        Sprite gameMaster = new Ai(8.5, 6.5, gameMasterImg, 100, deadGameMasterImg);
-        Sprite manman = new Sprite(17.5, 6.5, man);
+        BufferedImage unFired = ImageIO.read(new File("./fingerGun/noFire.png"));
+        BufferedImage fired = ImageIO.read(new File("./fingerGun/fire.png"));
+        Sprite gameMaster = new Ai(8.49, 6.5, gameMasterImg, 50, deadGameMasterImg);
+        Sprite manman = new Ai(17.5, 6.5, gameMasterImg,50,deadGameMasterImg);
+        gun = new Gun(unFired, 10, fired);
         sprites.add(gameMaster);
         sprites.add(manman);
       } catch (Exception e) {
@@ -63,6 +67,11 @@ public class World {
         floorTexture[i][j] = 1;
       }
     }
+  }
+
+  public static Gun getGun(){
+    loadTextures();
+    return gun;
   }
 
   public static List<Sprite> getsprites() {

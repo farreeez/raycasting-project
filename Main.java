@@ -43,6 +43,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private double[] wallDist;
   private List<Sprite> sprites;
   private double[][] spriteAngles;
+  private Gun gun;
 
   public Main() {
     if (debug) {
@@ -60,6 +61,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     sprites = World.getsprites();
     arrangeSprites(sprites, player.getPosition());
     spriteAngles = new double[sprites.size()][3];
+    gun = World.getGun();
 
     try {
       this.robot = new Robot();
@@ -99,6 +101,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           public void mousePressed(MouseEvent e) {
             int pressCode = e.getButton();
             if (pressCode == MouseEvent.BUTTON1) {
+              gun.fire();
               boolean open = false;
               int pos = 0;
               for (int i = (res - 1) / 2 - 6; i < (res - 1) / 2 + 6; i++) {
@@ -129,7 +132,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
                   // code for clicking on player or object
                   if (sprites.get(ray) instanceof Ai) {
                     Ai ai = (Ai) sprites.get(ray);
-                    ai.shot(10);
+                    ai.shot(gun.getDamage());
                     Sprite sp = (Sprite) ai;
                     sprites.set(ray, sp);
                   }
@@ -401,9 +404,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
               if (dead) {
                 int num = (int) spriteHeight - k - 1;
                 double pos =
-                    (screenHeight - (720 / distanceFromPlayer)) / 2
-                        + (720 / distanceFromPlayer);
-                screenY = (int) Math.round(pos-num);
+                    (screenHeight - (720 / distanceFromPlayer)) / 2 + (720 / distanceFromPlayer);
+                screenY = (int) Math.round(pos - num);
               }
               if ((rgb >> 24 & 0xFF) != 0) {
                 g.setColor(new Color(rgb));
@@ -434,6 +436,9 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         (screenHeight - 40) / 2 - crosairSize / 2,
         crosairSize,
         crosairSize);
+
+    g.drawImage(
+        gun.getImg(), (2 * screenWidth) / 3, screenHeight - 40 - gun.getImg().getHeight(), this);
   }
 
   private boolean isBehind(int index, double distance) {
