@@ -1,9 +1,9 @@
 import java.awt.image.BufferedImage;
 
 public class Sprite {
-    private double posX;
-    private double posY;
-    private BufferedImage sprite;
+    protected double posX;
+    protected double posY;
+    protected BufferedImage sprite;
 
     public Sprite(double posX, double posY, BufferedImage sprite){
         this.posX = posX;

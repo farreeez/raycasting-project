@@ -7,14 +7,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
 public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenWidth = 960;
   private static int screenHeight = 720;
-  private int res = Math.round(screenWidth / 4);
+  private int res = Math.round(screenWidth / 6);
   public static boolean debug = false;
   private Player player;
   private Timer timer;
@@ -30,7 +29,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private boolean mvLeft = true;
   private boolean rtRight = true;
   private boolean rtLeft = true;
-  private static GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
+  private static GraphicsDevice device =
+      GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
   private boolean fullscreen = false;
   private static JFrame frame;
   private int centreX;
@@ -71,7 +71,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 
     // Create a new blank cursor.
-    blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+    blankCursor =
+        Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
 
     originalCursor = getCursor();
 
@@ -89,58 +90,63 @@ public class Main extends JPanel implements KeyListener, ActionListener {
             }
           }
         });
-    this.addMouseListener(new MouseListener() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-      }
+    this.addMouseListener(
+        new MouseListener() {
+          @Override
+          public void mouseClicked(MouseEvent e) {}
 
-      @Override
-      public void mousePressed(MouseEvent e) {
-        int pressCode = e.getButton();
-        if (pressCode == MouseEvent.BUTTON1) {
-          boolean open = false;
-          int pos = 0;
-          for (int i = (res - 1) / 2 - 6; i < (res - 1) / 2 + 6; i++) {
-            if (imageArray[i][1] == -1) {
-              open = true;
-              pos = i;
-              break;
-            }
-          }
-          if (open) {
-            int[][] worldMap = World.getMap();
-            worldMap[(int) imageArray[pos][5]][(int) imageArray[pos][6]] = 0;
-            World.setMap(worldMap);
-          } else {
-            boolean spriteInWay = false;
-            int ray = 0;
-            for (int i = 0; i < spriteAngles.length; i++) {
-              if ((res - 1) / 2 >= spriteAngles[i][0] && (res - 1) / 2 <= spriteAngles[i][1]) {
-                spriteInWay = true;
-                ray = i;
-                break;
+          @Override
+          public void mousePressed(MouseEvent e) {
+            int pressCode = e.getButton();
+            if (pressCode == MouseEvent.BUTTON1) {
+              boolean open = false;
+              int pos = 0;
+              for (int i = (res - 1) / 2 - 6; i < (res - 1) / 2 + 6; i++) {
+                if (imageArray[i][1] == -1) {
+                  open = true;
+                  pos = i;
+                  break;
+                }
+              }
+              if (open) {
+                int[][] worldMap = World.getMap();
+                worldMap[(int) imageArray[pos][5]][(int) imageArray[pos][6]] = 0;
+                World.setMap(worldMap);
+              } else {
+                boolean spriteInWay = false;
+                int ray = 0;
+                for (int i = 0; i < spriteAngles.length; i++) {
+                  if ((res - 1) / 2 >= spriteAngles[i][0] && (res - 1) / 2 <= spriteAngles[i][1]) {
+                    spriteInWay = true;
+                    ray = i;
+                    break;
+                  }
+                }
+
+                if (spriteInWay
+                    && isBehind((res - 1) / 2, spriteAngles[ray][2])
+                    && spriteAngles[ray][2] >= 0.5) {
+                  // code for clicking on player or object
+                  if (sprites.get(ray) instanceof Ai) {
+                    Ai ai = (Ai) sprites.get(ray);
+                    ai.shot(10);
+                    Sprite sp = (Sprite) ai;
+                    sprites.set(ray, sp);
+                  }
+                }
               }
             }
-
-            if (spriteInWay && isBehind((res - 1) / 2, spriteAngles[ray][2]) && spriteAngles[ray][2] >= 0.5) {
-              // code for clicking on player or object
-            }
           }
-        }
-      }
 
-      @Override
-      public void mouseReleased(MouseEvent e) {
-      }
+          @Override
+          public void mouseReleased(MouseEvent e) {}
 
-      @Override
-      public void mouseEntered(MouseEvent e) {
-      }
+          @Override
+          public void mouseEntered(MouseEvent e) {}
 
-      @Override
-      public void mouseExited(MouseEvent e) {
-      }
-    });
+          @Override
+          public void mouseExited(MouseEvent e) {}
+        });
   }
 
   public static void main(String[] args) {
@@ -186,12 +192,16 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       for (int j = 0; j < imageArray.length; j++) {
         double currentDistance = textureHeight / (Math.cos(imageArray[j][2]) * i * 2 * 0.8);
 
-        double posX = imageArray[0][8] + currentDistance * Math.cos(Math.toRadians(imageArray[j][7]));
-        double posY = imageArray[0][9] - currentDistance * Math.sin(Math.toRadians(imageArray[j][7]));
+        double posX =
+            imageArray[0][8] + currentDistance * Math.cos(Math.toRadians(imageArray[j][7]));
+        double posY =
+            imageArray[0][9] - currentDistance * Math.sin(Math.toRadians(imageArray[j][7]));
 
         Color floorColor = Color.white;
 
-        if (posY >= 0 && posY < World.floorTexture.length && posX >= 0
+        if (posY >= 0
+            && posY < World.floorTexture.length
+            && posX >= 0
             && posX < World.floorTexture[(int) posY].length) {
           double factor = 1 / Math.pow(currentDistance, 0.2);
           if (World.floorTexture[(int) Math.floor(posY)][(int) Math.floor(posX)] == 1) {
@@ -202,8 +212,15 @@ public class Main extends JPanel implements KeyListener, ActionListener {
             floorColor = new Color(floor.getRGB((int) Math.floor(tx), (int) Math.floor(ty)));
           }
           g.setColor(adjustColorBrightness(floorColor, factor));
-          g.drawLine((int) Math.floor(j * steps), floorScreenPosY, (int) Math.floor((j + 1) * steps), floorScreenPosY);
-          g.drawLine((int) Math.floor(j * steps), ceilingScreenPosY, (int) Math.floor((j + 1) * steps),
+          g.drawLine(
+              (int) Math.floor(j * steps),
+              floorScreenPosY,
+              (int) Math.floor((j + 1) * steps),
+              floorScreenPosY);
+          g.drawLine(
+              (int) Math.floor(j * steps),
+              ceilingScreenPosY,
+              (int) Math.floor((j + 1) * steps),
               ceilingScreenPosY);
         }
       }
@@ -256,15 +273,20 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
       for (int j = start; j < height; j++) {
         try {
-          Color color = new Color(
-              image.getRGB(
-                  (int) Math.floor(xTexture * textureWidth), (int) (j * textureFactorFraction)));
+          Color color =
+              new Color(
+                  image.getRGB(
+                      (int) Math.floor(xTexture * textureWidth),
+                      (int) (j * textureFactorFraction)));
           if (imageArray[i][1] != 0) {
             g.setColor(adjustColorBrightness(color, factor));
           } else {
             g.setColor(color);
           }
-          g.drawLine((int) Math.round(width * i), startingHeight + j, (int) Math.round(width * (i + 1)),
+          g.drawLine(
+              (int) Math.round(width * i),
+              startingHeight + j,
+              (int) Math.round(width * (i + 1)),
               startingHeight + j);
         } catch (Exception e) {
         }
@@ -313,7 +335,14 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     double currentPosY = imageArray[0][9];
     double playerAngle = Math.toRadians(imageArray[(res - 1) / 2][7]);
     for (int i = 0; i < sprites.size(); i++) {
+      boolean dead = false;
       Sprite currentSprite = sprites.get(i);
+      if (currentSprite instanceof Ai) {
+        Ai ai = (Ai) currentSprite;
+        if (ai.isDead()) {
+          dead = true;
+        }
+      }
       double[] spritePos = currentSprite.getpos();
 
       double spriteDirY = -(spritePos[0] - currentPosY);
@@ -322,11 +351,15 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
       double angleDiff = fixAngle(Math.PI / 2 - spriteAngle);
 
-      double distanceFromPlayer = distBetweenPoints(currentPosX, currentPosY, spritePos[1], spritePos[0]);
+      double distanceFromPlayer =
+          distBetweenPoints(currentPosX, currentPosY, spritePos[1], spritePos[0]);
 
       spriteAngles[i][2] = distanceFromPlayer;
       if ((angleDiff <= Math.toRadians(45)) && (distanceFromPlayer >= 0.5)) {
         BufferedImage img = currentSprite.getTexture();
+        if (dead) {
+          textureHeight /= 4;
+        }
         double spriteHeight = (textureHeight / (distanceFromPlayer));
         double spriteProportion = ((double) img.getWidth()) / img.getHeight();
         double spriteWidth = (spriteProportion * spriteHeight);
@@ -341,8 +374,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         double middlePos = angleDiff * screenWidth / (Math.PI / 2);
 
         double spritePixel = middlePos + 0 * 4 - spriteWidth / 2;
-        spritePixel = (int) Math
-            .floor((((double) spritePixel) / screenWidth) * imageArray.length);
+        spritePixel = (int) Math.floor((((double) spritePixel) / screenWidth) * imageArray.length);
         double rightAngle = 0;
         double leftAngle = 0;
 
@@ -350,12 +382,11 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           leftAngle = (int) spritePixel;
         }
         spritePixel = middlePos + adjustedSpriteWidth * 4 - spriteWidth / 2;
-        spritePixel = (int) Math
-            .floor((((double) spritePixel) / screenWidth) * imageArray.length);
+        spritePixel = (int) Math.floor((((double) spritePixel) / screenWidth) * imageArray.length);
         if (spritePixel >= 0 && spritePixel <= imageArray.length) {
           rightAngle = (int) spritePixel;
         }
-        double[] arr = { leftAngle, rightAngle, distanceFromPlayer };
+        double[] arr = {leftAngle, rightAngle, distanceFromPlayer};
         spriteAngles[i] = arr;
 
         for (int j = 0; j < adjustedSpriteWidth; j++) {
@@ -367,6 +398,13 @@ public class Main extends JPanel implements KeyListener, ActionListener {
               int ty = (int) Math.floor(k * heightFactor);
               int rgb = img.getRGB(tx, ty);
               int screenY = (int) Math.round(((screenHeight - spriteHeight - 30) / 2) + k);
+              if (dead) {
+                int num = (int) spriteHeight - k - 1;
+                double pos =
+                    (screenHeight - (720 / distanceFromPlayer)) / 2
+                        + (720 / distanceFromPlayer);
+                screenY = (int) Math.round(pos-num);
+              }
               if ((rgb >> 24 & 0xFF) != 0) {
                 g.setColor(new Color(rgb));
                 g.drawLine(screenX, screenY, screenX + 4, screenY);
@@ -414,7 +452,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private void arrangeSprites(List<Sprite> sprites, double[] position) {
     for (int i = 0; i < sprites.size(); i++) {
       int current = i;
-      while (current > 0 && sprites.get(current).getDist(position) < sprites.get(current - 1).getDist(position)) {
+      while (current > 0
+          && sprites.get(current).getDist(position) < sprites.get(current - 1).getDist(position)) {
         Sprite saved = sprites.get(current);
         sprites.set(current, sprites.get(current - 1));
         sprites.set(current - 1, saved);
@@ -551,8 +590,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   }
 
   @Override
-  public void keyTyped(KeyEvent e) {
-  }
+  public void keyTyped(KeyEvent e) {}
 
   @Override
   public void keyReleased(KeyEvent e) {
