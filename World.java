@@ -48,7 +48,6 @@ public class World {
         floorCeilingTextures.add(ImageIO.read(new File("./floorAndCeilingTextures/1.jpg")));
         BufferedImage gameMasterImg = ImageIO.read(new File("./sprites/stickman.png"));
         BufferedImage deadGameMasterImg = ImageIO.read(new File("./sprites/deadstickman.png"));
-        BufferedImage man = ImageIO.read(new File("./sprites/stickman.png"));
         BufferedImage unFired = ImageIO.read(new File("./fingerGun/noFire.png"));
         BufferedImage fired = ImageIO.read(new File("./fingerGun/fire.png"));
         Sprite gameMaster = new Ai(8.49, 6.5, gameMasterImg, 50, deadGameMasterImg);

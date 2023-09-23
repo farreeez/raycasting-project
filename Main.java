@@ -334,6 +334,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
 
     // drawing sprites
 
+    arrangeSprites(sprites, player.getPosition());
     double currentPosX = imageArray[0][8];
     double currentPosY = imageArray[0][9];
     double playerAngle = Math.toRadians(imageArray[(res - 1) / 2][7]);
@@ -458,7 +459,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     for (int i = 0; i < sprites.size(); i++) {
       int current = i;
       while (current > 0
-          && sprites.get(current).getDist(position) < sprites.get(current - 1).getDist(position)) {
+          && sprites.get(current).getDist(position) > sprites.get(current - 1).getDist(position)) {
         Sprite saved = sprites.get(current);
         sprites.set(current, sprites.get(current - 1));
         sprites.set(current - 1, saved);
