@@ -29,8 +29,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private boolean mvLeft = true;
   private boolean rtRight = true;
   private boolean rtLeft = true;
-  private static GraphicsDevice device =
-      GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
+  private static GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
   private boolean fullscreen = false;
   private static JFrame frame;
   private int centreX;
@@ -73,8 +72,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 
     // Create a new blank cursor.
-    blankCursor =
-        Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+    blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
 
     originalCursor = getCursor();
 
@@ -95,7 +93,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
     this.addMouseListener(
         new MouseListener() {
           @Override
-          public void mouseClicked(MouseEvent e) {}
+          public void mouseClicked(MouseEvent e) {
+          }
 
           @Override
           public void mousePressed(MouseEvent e) {
@@ -141,13 +140,16 @@ public class Main extends JPanel implements KeyListener, ActionListener {
           }
 
           @Override
-          public void mouseReleased(MouseEvent e) {}
+          public void mouseReleased(MouseEvent e) {
+          }
 
           @Override
-          public void mouseEntered(MouseEvent e) {}
+          public void mouseEntered(MouseEvent e) {
+          }
 
           @Override
-          public void mouseExited(MouseEvent e) {}
+          public void mouseExited(MouseEvent e) {
+          }
         });
   }
 
@@ -194,10 +196,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       for (int j = 0; j < imageArray.length; j++) {
         double currentDistance = textureHeight / (Math.cos(imageArray[j][2]) * i * 2 * 0.8);
 
-        double posX =
-            imageArray[0][8] + currentDistance * Math.cos(Math.toRadians(imageArray[j][7]));
-        double posY =
-            imageArray[0][9] - currentDistance * Math.sin(Math.toRadians(imageArray[j][7]));
+        double posX = imageArray[0][8] + currentDistance * Math.cos(Math.toRadians(imageArray[j][7]));
+        double posY = imageArray[0][9] - currentDistance * Math.sin(Math.toRadians(imageArray[j][7]));
 
         Color floorColor = Color.white;
 
@@ -275,11 +275,10 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       }
       for (int j = start; j < height; j++) {
         try {
-          Color color =
-              new Color(
-                  image.getRGB(
-                      (int) Math.floor(xTexture * textureWidth),
-                      (int) (j * textureFactorFraction)));
+          Color color = new Color(
+              image.getRGB(
+                  (int) Math.floor(xTexture * textureWidth),
+                  (int) (j * textureFactorFraction)));
           if (imageArray[i][1] != 0) {
             g.setColor(adjustColorBrightness(color, factor));
           } else {
@@ -353,46 +352,46 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       double spriteAngle = findAngle(spriteDirY, spriteDirX, playerAngle);
 
       double angleDiff = fixAngle(Math.PI / 2 - spriteAngle);
+      double orgAngleDiff = angleDiff;
 
-      double distanceFromPlayer =
-          distBetweenPoints(currentPosX, currentPosY, spritePos[1], spritePos[0]);
+      double distanceFromPlayer = distBetweenPoints(currentPosX, currentPosY, spritePos[1], spritePos[0]);
 
       spriteAngles[i][2] = distanceFromPlayer;
-      if ((angleDiff <= Math.toRadians(45)) && (distanceFromPlayer >= 0.5)) {
-        BufferedImage img = currentSprite.getTexture();
-        double currentTextureHeight = textureHeight;
-        if (dead) {
-          currentTextureHeight /= 4;
-        }
-        double spriteHeight = (currentTextureHeight / (distanceFromPlayer));
-        double spriteProportion = ((double) img.getWidth()) / img.getHeight();
-        double spriteWidth = (spriteProportion * spriteHeight);
-        double adjustedSpriteWidth = spriteWidth / 4;
-        double widthFactor = img.getWidth() / adjustedSpriteWidth;
-        double heightFactor = img.getHeight() / spriteHeight;
-        if (isBiggerThan(spriteAngle, Math.PI / 2)) {
-          angleDiff += Math.PI / 4;
-        } else {
-          angleDiff = Math.PI / 4 - angleDiff;
-        }
-        double middlePos = angleDiff * screenWidth / (Math.PI / 2);
 
-        double spritePixel = middlePos + 0 * 4 - spriteWidth / 2;
-        spritePixel = (int) Math.floor((((double) spritePixel) / screenWidth) * imageArray.length);
-        double rightAngle = 0;
-        double leftAngle = 0;
+      BufferedImage img = currentSprite.getTexture();
+      double currentTextureHeight = textureHeight;
+      if (dead) {
+        currentTextureHeight /= 4;
+      }
+      double spriteHeight = (currentTextureHeight / (distanceFromPlayer));
+      double spriteProportion = ((double) img.getWidth()) / img.getHeight();
+      double spriteWidth = (spriteProportion * spriteHeight);
+      double adjustedSpriteWidth = spriteWidth / 4;
+      double widthFactor = img.getWidth() / adjustedSpriteWidth;
+      double heightFactor = img.getHeight() / spriteHeight;
+      if (isBiggerThan(spriteAngle, Math.PI / 2)) {
+        angleDiff += Math.PI / 4;
+      } else {
+        angleDiff = Math.PI / 4 - angleDiff;
+      }
+      double middlePos = angleDiff * screenWidth / (Math.PI / 2);
 
-        if (spritePixel >= 0 && spritePixel <= screenWidth) {
-          leftAngle = (int) spritePixel;
-        }
-        spritePixel = middlePos + adjustedSpriteWidth * 4 - spriteWidth / 2;
-        spritePixel = (int) Math.floor((((double) spritePixel) / screenWidth) * imageArray.length);
-        if (spritePixel >= 0 && spritePixel <= imageArray.length) {
-          rightAngle = (int) spritePixel;
-        }
-        double[] arr = {leftAngle, rightAngle, distanceFromPlayer};
-        spriteAngles[i] = arr;
+      double spritePixel = middlePos + 0 * 4 - spriteWidth / 2;
+      spritePixel = (int) Math.floor((((double) spritePixel) / screenWidth) * imageArray.length);
+      double rightAngle = 0;
+      double leftAngle = 0;
 
+      if (spritePixel >= 0 && spritePixel <= screenWidth) {
+        leftAngle = (int) spritePixel;
+      }
+      spritePixel = middlePos + adjustedSpriteWidth * 4 - spriteWidth / 2;
+      spritePixel = (int) Math.floor((((double) spritePixel) / screenWidth) * imageArray.length);
+      if (spritePixel >= 0 && spritePixel <= imageArray.length) {
+        rightAngle = (int) spritePixel;
+      }
+      double[] arr = { leftAngle, rightAngle, distanceFromPlayer };
+      spriteAngles[i] = arr;
+      if ((orgAngleDiff <= Math.toRadians(45)) && (distanceFromPlayer >= 0.5)) {
         for (int j = 0; j < adjustedSpriteWidth; j++) {
           int screenX = (int) (middlePos + j * 4 - spriteWidth / 2);
           int currentRay = (int) Math.floor((((double) screenX) / screenWidth) * imageArray.length);
@@ -404,8 +403,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
               int screenY = (int) Math.round(((screenHeight - spriteHeight - 30) / 2) + k);
               if (dead) {
                 int num = (int) spriteHeight - k - 1;
-                double pos =
-                    (screenHeight - (720 / distanceFromPlayer)) / 2 + (720 / distanceFromPlayer);
+                double pos = (screenHeight - (720 / distanceFromPlayer)) / 2 + (720 / distanceFromPlayer);
                 screenY = (int) Math.round(pos - num);
               }
               if ((rgb >> 24 & 0xFF) != 0) {
@@ -596,7 +594,8 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   }
 
   @Override
-  public void keyTyped(KeyEvent e) {}
+  public void keyTyped(KeyEvent e) {
+  }
 
   @Override
   public void keyReleased(KeyEvent e) {
