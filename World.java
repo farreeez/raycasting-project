@@ -53,9 +53,11 @@ public class World {
         BufferedImage fired = ImageIO.read(new File("./fingerGun/fire.png"));
         Sprite gameMaster = new Ai(8.49, 6.5, gameMasterImg, 50, deadGameMasterImg);
         Sprite manman = new Ai(17.5, 6.5, gameMasterImg,50,deadGameMasterImg);
+        Sprite pp = new Ai(11.5, 12.5, gameMasterImg,50,deadGameMasterImg);
         gun = new Gun(unFired, 10, fired);
         sprites.add(gameMaster);
         sprites.add(manman);
+        sprites.add(pp);
       } catch (Exception e) {
         System.out.println(e);
       }

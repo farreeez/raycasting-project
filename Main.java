@@ -240,7 +240,7 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       factor = Math.min(factor, 1.3);
 
       double distanceFactor = Math.cos(imageArray[i][2]) * originalDistance;
-      wallDist[i] = distanceFactor;
+      wallDist[i] = originalDistance;
 
       distanceFactor *= 0.8;
 
