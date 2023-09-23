@@ -122,7 +122,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
                   if ((res - 1) / 2 >= spriteAngles[i][0] && (res - 1) / 2 <= spriteAngles[i][1]) {
                     spriteInWay = true;
                     ray = i;
-                    break;
                   }
                 }
 
@@ -361,10 +360,11 @@ public class Main extends JPanel implements KeyListener, ActionListener {
       spriteAngles[i][2] = distanceFromPlayer;
       if ((angleDiff <= Math.toRadians(45)) && (distanceFromPlayer >= 0.5)) {
         BufferedImage img = currentSprite.getTexture();
+        double currentTextureHeight = textureHeight;
         if (dead) {
-          textureHeight /= 4;
+          currentTextureHeight /= 4;
         }
-        double spriteHeight = (textureHeight / (distanceFromPlayer));
+        double spriteHeight = (currentTextureHeight / (distanceFromPlayer));
         double spriteProportion = ((double) img.getWidth()) / img.getHeight();
         double spriteWidth = (spriteProportion * spriteHeight);
         double adjustedSpriteWidth = spriteWidth / 4;
