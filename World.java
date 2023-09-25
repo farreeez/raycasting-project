@@ -32,7 +32,7 @@ public class World {
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
   };
 
-  public static int floorTexture[][] = new int[25][24];
+  public static int floorTexture[][] = new int[100][100];
 
   private static List<BufferedImage> wallTextures = new ArrayList<>();
   private static List<BufferedImage> floorCeilingTextures = new ArrayList<>();
@@ -45,14 +45,15 @@ public class World {
       try {
         wallTextures.add(ImageIO.read(new File("./wallTextures/1.png")));
         wallTextures.add(ImageIO.read(new File("./wallTextures/2.jpg")));
+        wallTextures.add(ImageIO.read(new File("./wallTextures/2.png")));
         floorCeilingTextures.add(ImageIO.read(new File("./floorAndCeilingTextures/1.jpg")));
         BufferedImage gameMasterImg = ImageIO.read(new File("./sprites/stickman.png"));
         BufferedImage deadGameMasterImg = ImageIO.read(new File("./sprites/deadstickman.png"));
         BufferedImage unFired = ImageIO.read(new File("./fingerGun/noFire.png"));
         BufferedImage fired = ImageIO.read(new File("./fingerGun/fire.png"));
         Sprite gameMaster = new Ai(8.49, 6.5, gameMasterImg, 50, deadGameMasterImg);
-        Sprite manman = new Ai(17.5, 6.5, gameMasterImg,50,deadGameMasterImg);
-        Sprite pp = new Ai(11.5, 12.5, gameMasterImg,50,deadGameMasterImg);
+        Sprite manman = new Ai(17.5, 6.5, gameMasterImg, 50, deadGameMasterImg);
+        Sprite pp = new Ai(11.5, 12.5, gameMasterImg, 50, deadGameMasterImg);
         gun = new Gun(unFired, 10, fired);
         sprites.add(gameMaster);
         sprites.add(manman);
@@ -63,14 +64,14 @@ public class World {
       unloaded = false;
     }
 
-    for (int i = 0; i < worldMap.length; i++) {
-      for (int j = 0; j < worldMap[0].length; j++) {
+    for (int i = 0; i < 100; i++) {
+      for (int j = 0; j < 100; j++) {
         floorTexture[i][j] = 1;
       }
     }
   }
 
-  public static Gun getGun(){
+  public static Gun getGun() {
     loadTextures();
     return gun;
   }

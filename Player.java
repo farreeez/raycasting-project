@@ -8,6 +8,8 @@ public class Player {
   private double fov = 90;
   private double inc;
   private double[][] viewPlane;
+  public static double[][] portals = {{-1, -1}, {-1, -1}};
+  private int portalCount = 0;
 
   public Player(int res) {
     int pos = 0;
@@ -25,10 +27,8 @@ public class Player {
     changeDirection();
   }
 
-  
-
   public double[] getPosition() {
-    double[] position = { posY, posX };
+    double[] position = {posY, posX};
     return position;
   }
 
@@ -40,6 +40,8 @@ public class Player {
     double[] imageArray = new double[11];
     double hypX = 1000000000;
     double hypY = 1000000000;
+    double savedHypY = 0;
+    double savedHypX = 0;
     double yStep = 0;
     double xStep = 0;
     double xMain = 0;
@@ -62,7 +64,7 @@ public class Player {
         if (count == 0) {
           hypX = 0;
         }
-        if (hypX <= hypY) {
+        if (hypX + savedHypX <= hypY + savedHypY) {
           // if the position of the player is not on the edges
           if (count == 0) {
             // calculates the length of the step that is needed to reach the closest edge.
@@ -79,9 +81,10 @@ public class Player {
             yStep += getSign(viewPlane[i][1]) * -1;
           }
           // calculates the hypotinuse and the x factor that the line moves by.
-          hypX = Math.abs(yStep)
-              * Math.sqrt(1 + Math.pow(viewPlane[i][2] / viewPlane[i][1], 2))
-              / roundingValue;
+          hypX =
+              Math.abs(yStep)
+                  * Math.sqrt(1 + Math.pow(viewPlane[i][2] / viewPlane[i][1], 2))
+                  / roundingValue;
           allowed = false;
         }
       }
@@ -90,7 +93,7 @@ public class Player {
         if (count == 0) {
           hypY = 0;
         }
-        if ((hypY <= hypX && allowed) || xCount == 0) {
+        if ((hypY + savedHypY <= hypX + savedHypX && allowed) || xCount == 0) {
           if (xCount == 0) {
             double posXfloor = Math.floor(posX);
             if (viewPlane[i][2] < 0) {
@@ -101,17 +104,18 @@ public class Player {
           } else {
             xStep += getSign(viewPlane[i][2]);
           }
-          hypY = Math.abs(xStep)
-              * Math.sqrt(1 + Math.pow(viewPlane[i][1] / viewPlane[i][2], 2))
-              / roundingValue;
+          hypY =
+              Math.abs(xStep)
+                  * Math.sqrt(1 + Math.pow(viewPlane[i][1] / viewPlane[i][2], 2))
+                  / roundingValue;
           xCount++;
         }
       }
 
-      if (hypX < hypY) {
+      if (hypX + savedHypX < hypY + savedHypY) {
         yMain = yStep;
         imageArray[3] = 1;
-      } else if (hypY < hypX) {
+      } else if (hypY + savedHypY < hypX + savedHypX) {
         xMain = xStep;
         imageArray[3] = 0.5;
       }
@@ -120,13 +124,48 @@ public class Player {
       x = (int) Math.floor((xMain + posX) / roundingValue);
       if (x >= 0 && y >= 0 && y < worldMap.length && x < worldMap[y].length) {
         if (worldMap[y][x] != 0) {
-          noBoundary = false;
+          double[] arr = {y, x};
+          // System.out.println(portals[1][0] + "x:"+ portals[1][1]);
+          // System.out.println(portals[0][0] + "x:"+ portals[0][1]);
+          // System.out.println(portalCount);
+          // double[] arr1 = {y, x};
+          if ((isEqual(arr, portals[1]) || isEqual(arr, portals[0]))
+              && portals[0][0] > 0
+              && portals[1][0] > 0) {
+            // System.out.println("yes");
+            count = 0;
+            xCount = 0;
+            y = 0;
+            x = 0;
+            savedHypX += hypX;
+            savedHypY += hypY;
+            hypX = 1000000000;
+            hypY = 1000000000;
+            yStep = 0;
+            xStep = 0;
+            xMain = 0;
+            yMain = 0;
+            // portalCount++;
+            double differenceY = yMain + posY - y;
+            double differenceX = xMain + posX - y;
+            if (isEqual(arr, portals[1])) {
+              posX = portals[0][1] + differenceX;
+              posY = portals[0][0] + differenceY;
+              portalCount++;
+            } else if (isEqual(arr, portals[0])) {
+              posX = portals[1][1] + differenceX;
+              posY = portals[1][0] + differenceY;
+              portalCount++;
+            }
+          } else {
+            noBoundary = false;
+          }
         }
       }
       count++;
     }
 
-    imageArray[0] = Math.min(hypX, hypY);
+    imageArray[0] = Math.min(hypX + savedHypX, hypY + savedHypY);
     if (imageArray[3] == 0.5) {
       // y
       double opposite = Math.sin(viewPlane[i][0]) * imageArray[0];
@@ -167,41 +206,47 @@ public class Player {
     return imageArray;
   }
 
+  private boolean isEqual(double[] arr1, double[] arr2) {
+    return (arr1[0] == arr2[0]) && (arr1[1] == arr2[1]);
+  }
+
   // rotates the angle to the right
   public void rotateRight() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.rotateRight) {
-          for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] -= 0.017;
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.rotateRight) {
+              for (int i = 0; i < viewPlane.length; i++) {
+                viewPlane[i][0] -= 0.017;
+              }
+              changeDirection();
+            } else {
+              timer.cancel();
+            }
           }
-          changeDirection();
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
   // rotates the angle to the left
   public void rotateLeft() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.rotateLeft) {
-          for (int i = 0; i < viewPlane.length; i++) {
-            viewPlane[i][0] += 0.017;
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.rotateLeft) {
+              for (int i = 0; i < viewPlane.length; i++) {
+                viewPlane[i][0] += 0.017;
+              }
+              changeDirection();
+            } else {
+              timer.cancel();
+            }
           }
-          changeDirection();
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
@@ -219,7 +264,8 @@ public class Player {
   private void changeDirection() {
     // changeDirection(Math.PI / 4 + Math.PI);
     for (int i = 0; i < viewPlane.length; i++) {
-      viewPlane[i][0] = viewPlane[i][0] - Math.floor(viewPlane[i][0] / (2 * Math.PI)) * (2 * Math.PI);
+      viewPlane[i][0] =
+          viewPlane[i][0] - Math.floor(viewPlane[i][0] / (2 * Math.PI)) * (2 * Math.PI);
       if (viewPlane[i][0] > Math.PI || viewPlane[i][0] < 0) {
         viewPlane[i][1] = -1;
       } else {
@@ -239,65 +285,69 @@ public class Player {
 
   public void moveForward() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.forward) {
-          double angle = viewPlane[(res - 1) / 2][0];
-          move(angle);
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.forward) {
+              double angle = viewPlane[(res - 1) / 2][0];
+              move(angle);
+            } else {
+              timer.cancel();
+            }
+          }
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
   public void moveBack() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.backward) {
-          double angle = viewPlane[(res - 1) / 2][0] + Math.PI;
-          move(angle);
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.backward) {
+              double angle = viewPlane[(res - 1) / 2][0] + Math.PI;
+              move(angle);
+            } else {
+              timer.cancel();
+            }
+          }
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
   public void moveRight() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.right) {
-          double angle = viewPlane[(res - 1) / 2][0] - Math.PI / 2;
-          move(angle);
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.right) {
+              double angle = viewPlane[(res - 1) / 2][0] - Math.PI / 2;
+              move(angle);
+            } else {
+              timer.cancel();
+            }
+          }
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
   public void moveLeft() {
     Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (Main.left) {
-          double angle = viewPlane[(res - 1) / 2][0] + Math.PI / 2;
-          move(angle);
-        } else {
-          timer.cancel();
-        }
-      }
-    };
+    TimerTask task =
+        new TimerTask() {
+          @Override
+          public void run() {
+            if (Main.left) {
+              double angle = viewPlane[(res - 1) / 2][0] + Math.PI / 2;
+              move(angle);
+            } else {
+              timer.cancel();
+            }
+          }
+        };
     timer.scheduleAtFixedRate(task, 0, 5);
   }
 
@@ -338,5 +388,4 @@ public class Player {
       this.posX = posX;
     }
   }
-
 }
