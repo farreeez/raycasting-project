@@ -157,9 +157,6 @@ public class Player {
 
   public double[][] ddaCaster() {
     double[][] imageArray = new double[res][10];
-    if (Main.debug) {
-      imageArray = new double[res][11];
-    }
     for (int i = 0; i < viewPlane.length; i++) {
       imageArray[i] = ddaCasterHelper(i, this.posX, this.posY);
     }

@@ -55,6 +55,7 @@ public class Gun {
       clip.start();
     } catch (Exception e) {
       // TODO: handle exception
+      System.out.println("gun sound failed");
     }
   }
 

@@ -15,7 +15,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private static int screenHeight = 720;
   private int resFactor = 6;
   private int res = Math.round(screenWidth / resFactor);
-  public static boolean debug = false;
   private Player player;
   private Timer timer;
   public static boolean forward = false;
@@ -46,11 +45,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private Gun gun;
 
   public Main() {
-    if (debug) {
-      res = 21;
-    } else if (res % 2 == 0) {
-      res += 1;
-    }
 
     player = new Player(res);
     imageArray = player.ddaCaster();
@@ -164,10 +158,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
   private void startGame() {
     timer = new Timer(15, this);
     timer.start();
-  }
-
-  private double rounder(double num) {
-    return Math.round(num * 100.0) / 100.0;
   }
 
   @Override
@@ -289,19 +279,6 @@ public class Main extends JPanel implements KeyListener, ActionListener {
         if ((startingHeight + j * heightScalingFactor) > screenHeight - 40) {
           break;
         }
-      }
-      if (debug) {
-        g.setColor(Color.WHITE);
-        g.setFont(g.getFont().deriveFont(24, 17.0f));
-        g.drawString("y: " + rounder(imageArray[i][5]), (int) Math.round(width * i), 100);
-        g.drawString("x: " + rounder(imageArray[i][6]), (int) Math.round(width * i), 200);
-        // g.drawString("ang: " + rounder(imageArray[i][7]), (int) Math.round(width *
-        // i), 300);
-        g.drawString("x: " + rounder(imageArray[i][8]), (int) Math.round(width * i), 400);
-        g.drawString("y: " + rounder(imageArray[i][9]), (int) Math.round(width * i), 500);
-        // g.drawString("colour: " + rounder(imageArray[i][10]), (int) Math.round(width
-        // * i), 600);
-        g.drawString("d: " + rounder(imageArray[i][0]), (int) Math.round(width * i), 600);
       }
     }
 
