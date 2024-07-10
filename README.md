@@ -4,9 +4,9 @@
 
 This project is my attempt at replicating the mechanisms behind the creation of early pseudo-3D games such as Wolfenstein 3D . It uses Java Swing for the graphical interface, ensuring real-time updates and smooth interactions. Rays are cast from the player's viewpoint to detect walls and obstacles, with trigonometric functions calculating angles and distances. A game loop continuously updates the game state for real-time player movement and interactions. Collision detection ensures accurate rendering by checking intersections between the player and the grid-based map.
 
-here are images demonstrating how the program works with different textures.
+here are images demonstrating how the program works.
 
-
+![image](https://github.com/farreeez/raycasting-project/assets/126973663/722f3082-dc1a-492b-896d-bc609ff95c08)
 
 ### Dependencies
 This project requires the following dependencies:
